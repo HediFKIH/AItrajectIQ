@@ -16,11 +16,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os 
 
+from comet import download_model, load_from_checkpoint
+
+
+
 load_dotenv(dotenv_path="../.env")
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-
+model_path = download_model("Unbabel/wmt22-comet-da")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -33,6 +37,7 @@ async def lifespan(app: FastAPI):
 
     app.state.embedding_model = SentenceTransformer("BAAI/bge-large-en-v1.5")
     app.state.openai_client = OpenAI(api_key=openai_api_key)
+    app.state.translation_eval_model = load_from_checkpoint(model_path)
     yield
 
 

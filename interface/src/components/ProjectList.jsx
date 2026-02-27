@@ -33,7 +33,7 @@ const ProjectList = ({ userId }) => {
   if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
-    <ListGroup>
+    <ListGroup className="w-50">
       {projects.map((project) => (
         <ListGroup.Item
           key={project._id}

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProjectsPage from "./pages/ProjectsPage";
 import LogsPage from "./pages/LogsPage";
 import LogDetailsPage from "./pages/LogDetailsPage";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           path="/projects/:projectId/:logId"
           element={<LogDetailsPage />}
         />
+        <Route path="/dashboard/:projectId" element={<DashboardPage />} />
       </Routes>
     </Router>
   );

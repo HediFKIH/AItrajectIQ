@@ -34,11 +34,17 @@ const LogList = ({ projectId }) => {
 
   return (
     <ListGroup>
-      {logs.map((log) => (
-        <ListGroup.Item key={log._id} action onClick={() => handleSelect(log)}>
-          {log.prompt}
-        </ListGroup.Item>
-      ))}
+      {[...logs]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)) // newest first
+        .map((log) => (
+          <ListGroup.Item
+            key={log._id}
+            action
+            onClick={() => handleSelect(log)}
+          >
+            {log.prompt}
+          </ListGroup.Item>
+        ))}
     </ListGroup>
   );
 };

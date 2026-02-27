@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { Button } from "react-bootstrap";
 import LogList from "../components/LogList";
 import RecordList from "../components/RecordList";
 import { getProject } from "../api";
@@ -28,19 +29,31 @@ const LogsPage = () => {
   if (project.type === "LLMExplain") {
     return (
       <div className="m-5">
-        <h2 className="mb-4">
-          Explainability Logs for <b>{project.name}</b>
-        </h2>
-        <h5 className="mb-4">Model: {project.model_name}</h5>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 className="mb-2">
+              Logs for <b>{project.name}</b>
+            </h2>
+            <h5 className="mb-0">Model: {project.model_name}</h5>
+          </div>
+          <Link to={`/dashboard/${projectId}`}>
+            <Button variant="primary">View Dashboard</Button>
+          </Link>
+        </div>
         <RecordList projectId={projectId} />
       </div>
     );
   } else {
     return (
       <div className="m-5">
-        <h2 className="mb-4">
-          Observability Logs for <b>{project.name}</b>
-        </h2>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2>
+            Logs for <b>{project.name}</b>
+          </h2>
+          <Link to={`/dashboard/${projectId}`}>
+            <Button variant="primary">View Dashboard</Button>
+          </Link>
+        </div>
         <LogList projectId={projectId} />
       </div>
     );

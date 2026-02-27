@@ -51,6 +51,7 @@ const LogDetailsPage = () => {
         <strong>Log:</strong> {log._id}
       </p>
 
+
       <Accordion defaultActiveKey="0">
         {Object.entries(log)
           .filter(([key, value]) => key !== "_id" && Boolean(value)) // filters out falsy values
@@ -60,13 +61,23 @@ const LogDetailsPage = () => {
                 <strong>{key}</strong>{" "}
               </Accordion.Header>
               <Accordion.Body>
-                <pre
-                  style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                >
-                  {typeof value === "object"
-                    ? JSON.stringify(value, null, 2)
-                    : value.toString()}
-                </pre>
+                {key === "metrics" && Array.isArray(value) ? (
+                  <div>
+                    {value.map((metric, metricIndex) => (
+                      <div key={metricIndex}>
+                        {metric.name}: {metric.value}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <pre
+                    style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                  >
+                    {typeof value === "object"
+                      ? JSON.stringify(value, null, 2)
+                      : value.toString()}
+                  </pre>
+                )}
               </Accordion.Body>
             </Accordion.Item>
           ))}
