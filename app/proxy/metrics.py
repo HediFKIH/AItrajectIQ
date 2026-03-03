@@ -36,16 +36,15 @@ def ask_openai_if_true(claim, client):
     model = get_model_name(client)
     
     prompt = f"""
-You are a knowledgeable assistant answering based on what you knew up to June 2024.
+You are a knowledgeable assistant answering based on what you know.
 
 Given the claim below, assess whether it is:
 - "true" if it's clearly correct and you remember it
 - "false" if it contradicts known facts
-- "unknown" if you're unsure or the information is unavailable
 
 Respond in JSON:
 {{
-  "decision": "true" | "false" | "unknown",
+  "decision": "true" | "false" ,
   "explanation": "short justification"
 }}
 
@@ -281,28 +280,28 @@ class Metrics:
             if decision == "true":
                 claim_score = 1.0
                 comment = f"LLM judged it as true (pre-knowledge).\nExplanation: {explanation}"
-            elif decision == "false":
+            else:
                 claim_score = 0.0
                 comment = f"LLM judged it as false (pre-knowledge).\nExplanation: {explanation}"
                 details.append({"claim": claim, "comment": comment})
                 self.hallucinations.append(claim)
-            else:  # "unknown"
-                print("waiting for contexts to be retrieved...")
-                contexts = await retrieve_context_from_api(claim)
-                entailment_result = check_claim_with_context(claim, contexts, self.client)
+            # else:  # "unknown"
+            #     print("waiting for contexts to be retrieved...")
+            #     contexts = await retrieve_context_from_api(claim)
+            #     entailment_result = check_claim_with_context(claim, contexts, self.client)
 
-                if entailment_result == "entail":
-                    claim_score = 1.0
-                    comment = f"RAG-based validation: Entailed\nContext: {contexts}"
-                    details.append({"claim": claim, "comment": comment})
-                elif entailment_result == "contradict":
-                    claim_score = 0.0
-                    comment = f"RAG-based validation: Contradicted\nContext: {contexts}"
-                    self.hallucinations.append(claim)
-                    details.append({"claim": claim, "comment": comment})
-                else:
-                    claim_score = 0.5
-                    comment = f"RAG-based validation: Neutral or Inconclusive\nContext: {contexts}"
+            #     if entailment_result == "entail":
+            #         claim_score = 1.0
+            #         comment = f"RAG-based validation: Entailed\nContext: {contexts}"
+            #         details.append({"claim": claim, "comment": comment})
+            #     elif entailment_result == "contradict":
+            #         claim_score = 0.0
+            #         comment = f"RAG-based validation: Contradicted\nContext: {contexts}"
+            #         self.hallucinations.append(claim)
+            #         details.append({"claim": claim, "comment": comment})
+            #     else:
+            #         claim_score = 0.5
+            #         comment = f"RAG-based validation: Neutral or Inconclusive\nContext: {contexts}"
 
             score += claim_score
 
@@ -494,9 +493,9 @@ Respond in JSON:
                 print("oops")
 
             prompt2 = self.query
-            if contexts_are_needed == "yes":
-                gt_contexts = await retrieve_context_from_api(self.query)
-                prompt2 = "contexts: " + gt_contexts + """\n query: """ + prompt2
+            # if contexts_are_needed == "yes":
+            #     gt_contexts = await retrieve_context_from_api(self.query)
+            #     prompt2 = "contexts: " + gt_contexts + """\n query: """ + prompt2
 
             response2 = self.client.chat.completions.create(
                 model=model,
