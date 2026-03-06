@@ -38,7 +38,7 @@ async def chat_completions(request: Request):
     pi_scanner=request.app.state.prompt_injection_scanner
     open_client=request.app.state.openai_client
     embedding_model=request.app.state.embedding_model
-    
+    translation_eval_model=request.app.state.translation_eval_model
     project_id, auth= extract_credentials(request, parsed_body)
     verified_project= await auth_verify(project_id, auth)
     metrics_list = verified_project.enabled_metrics
@@ -132,7 +132,7 @@ async def chat_completions(request: Request):
 
     formatted_response=format_openai_style_response(deanonymized_response, model= response.model, prompt_tokens= response.usage.prompt_tokens, completion_tokens= response.usage.completion_tokens)
 
-    metrics_obj=Metrics(prompt, anonymized_response, metrics_list, retrieved_contexts=contexts, client=open_client,embedding_model=embedding_model)
+    metrics_obj=Metrics(prompt, anonymized_response, metrics_list, retrieved_contexts=contexts, client=open_client,embedding_model=embedding_model, translation_eval_model=translation_eval_model)
 
     asyncio.create_task(metrics_obj.compute_and_save(log_id))
 
