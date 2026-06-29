@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<title>LLMInsight - Agent Trace</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f23;color:#ccc}
+#header{background:linear-gradient(135deg,#16213e,#0f3460);padding:18px 30px;border-bottom:2px solid #e94560;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+#header h1{font-size:20px;color:#e94560}
+#header .totals{font-size:13px;color:#aaa}
+#header .totals b{color:#4fc3f7}
+.badge{display:inline-block;background:#0f3460;color:#e94560;padding:2px 10px;border-radius:10px;font-size:11px;margin-left:10px;text-transform:uppercase;letter-spacing:1px}
+#summary{padding:15px 30px;background:#16213e;border-bottom:1px solid #333}
+#summary table{width:100%;border-collapse:collapse;font-size:13px}
+#summary th{text-align:left;color:#888;font-weight:normal;padding:4px 8px;border-bottom:1px solid #333}
+#summary td{padding:5px 8px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.cost{color:#4fc3f7;font-weight:bold}
+#timeline{padding:20px 30px;overflow-y:auto;max-height:calc(100vh - 260px)}
+.iteration{margin-bottom:22px}
+.iter-header{font-size:14px;font-weight:bold;color:#e94560;padding:6px 0;border-bottom:1px solid #333;margin-bottom:10px}
+.iter-stats{font-weight:normal;color:#666;font-size:12px;margin-left:10px}
+.cards-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px}
+.card{background:#1a1a3e;border-radius:6px;padding:12px 14px;min-width:210px;max-width:280px;flex-shrink:0;transition:background .15s}
+.card:hover{background:#22224a;transform:translateY(-1px)}
+.agent-name{font-size:15px;font-weight:bold;margin-bottom:2px}
+.model{font-size:11px;color:#888;margin-bottom:6px}
+.metrics{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;margin-bottom:5px}
+.metric{background:#0f0f23;padding:2px 7px;border-radius:3px;white-space:nowrap}
+.metric b{color:#ddd}
+.metric.cost b{color:#4fc3f7}
+.chain{font-size:10px;color:#555;margin-bottom:3px;font-family:monospace}
+.resp{font-size:10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#agent-flow{padding:12px 30px;background:#12122a;border-bottom:1px solid #333;overflow-x:auto;white-space:nowrap}
+#agent-flow h3{font-size:13px;color:#888;margin-bottom:8px;font-weight:normal}
+.flow-row{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
+.flow-pill{display:inline-block;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:bold;color:#fff;white-space:nowrap}
+.flow-pill small{font-weight:normal;opacity:.7}
+.flow-arrow{color:#555;font-size:16px;margin:0 2px}
+.flow-iter-sep{color:#e94560;font-size:11px;margin:8px 0 2px;font-weight:bold;text-transform:uppercase;letter-spacing:1px}
+.tree-node{padding:3px 0;display:flex;align-items:center;gap:6px}
+.tree-branch{color:#555;font-family:monospace;font-size:16px;width:16px;text-align:center;flex-shrink:0}
+.tree-parent{color:#aaa;font-size:13px;font-weight:bold}
+.export-btns{display:flex;gap:6px}
+.export-btn{background:#e94560;color:#fff;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:bold;letter-spacing:.5px}
+.export-btn:hover{background:#ff6b81}
+.export-btn.svg{background:#4fc3f7;color:#0f0f23}
+.export-btn.svg:hover{background:#81d4fa}
+</style></head>
+<body>
+<div id="header">
+    <h1>LLMInsight - Agent Trace <span class="badge">sequential</span></h1>
+    <div class="totals">
+        <b>24</b> LLM calls &middot; <b>8</b> agents &middot; <b>5</b> iterations &middot;
+        <b>68,822</b> tokens &middot; <b>70,614ms</b> &middot;
+        <b class="cost">$0.1490</b>
+    </div>
+    <div class="export-btns">
+        <button class="export-btn svg" onclick="exportSVG()">Export SVG</button>
+        <button class="export-btn" onclick="exportPNG()">Export PNG</button>
+    </div>
+</div>
+<div id="summary">
+<table>
+<tr><th>Agent</th><th class="num">Calls</th><th class="num">Tokens</th><th class="num">Latency</th><th class="num">Cost</th></tr>
+<tr>
+<td><span class="dot" style="background:#FF9800"></span>Action Agent</td>
+<td class="num">7</td>
+<td class="num">33,491</td>
+<td class="num">20,839ms</td>
+<td class="num cost">$0.0700</td></tr>
+<tr>
+<td><span class="dot" style="background:#9C27B0"></span>Planning Agent</td>
+<td class="num">5</td>
+<td class="num">9,146</td>
+<td class="num">11,978ms</td>
+<td class="num cost">$0.0217</td></tr>
+<tr>
+<td><span class="dot" style="background:#E91E63"></span>Reflection Agent</td>
+<td class="num">1</td>
+<td class="num">7,630</td>
+<td class="num">3,352ms</td>
+<td class="num cost">$0.0159</td></tr>
+<tr>
+<td><span class="dot" style="background:#2196F3"></span>Enrich With LLM</td>
+<td class="num">5</td>
+<td class="num">7,083</td>
+<td class="num">15,811ms</td>
+<td class="num cost">$0.0143</td></tr>
+<tr>
+<td><span class="dot" style="background:#FF5722"></span>Mobile Worker</td>
+<td class="num">1</td>
+<td class="num">3,378</td>
+<td class="num">4,822ms</td>
+<td class="num cost">$0.0087</td></tr>
+<tr>
+<td><span class="dot" style="background:#607D8B"></span>Filter Agent</td>
+<td class="num">1</td>
+<td class="num">3,378</td>
+<td class="num">4,872ms</td>
+<td class="num cost">$0.0081</td></tr>
+<tr>
+<td><span class="dot" style="background:#4CAF50"></span>Keypad Agent</td>
+<td class="num">3</td>
+<td class="num">3,618</td>
+<td class="num">6,202ms</td>
+<td class="num cost">$0.0073</td></tr>
+<tr>
+<td><span class="dot" style="background:#00BCD4"></span>Generate Session</td>
+<td class="num">1</td>
+<td class="num">1,098</td>
+<td class="num">2,738ms</td>
+<td class="num cost">$0.0030</td></tr>
+
+</table>
+</div>
+<div id="agent-flow">
+<h3>Agent Chain</h3>
+<div class="flow-row"><span class="flow-pill" style="background:#2196F3">Enrich With LLM</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#2196F3">Enrich With LLM</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#9C27B0">Planning Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#4CAF50">Keypad Agent</span></div><div class="flow-iter-sep">Iteration 2</div><div class="flow-row"><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#2196F3">Enrich With LLM</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#9C27B0">Planning Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#4CAF50">Keypad Agent</span></div><div class="flow-iter-sep">Iteration 3</div><div class="flow-row"><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#2196F3">Enrich With LLM</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#9C27B0">Planning Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#E91E63">Reflection Agent</span></div><div class="flow-iter-sep">Iteration 4</div><div class="flow-row"><span class="flow-pill" style="background:#2196F3">Enrich With LLM</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF9800">Action Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#9C27B0">Planning Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#4CAF50">Keypad Agent</span></div><div class="flow-iter-sep">Iteration 5</div><div class="flow-row"><span class="flow-pill" style="background:#9C27B0">Planning Agent</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#00BCD4">Generate Session</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#FF5722">Mobile Worker</span><span class="flow-arrow">&rarr;</span><span class="flow-pill" style="background:#607D8B">Filter Agent</span></div>
+</div>
+<div id="timeline">
+<div class="iteration">
+<div class="iter-header">Iteration 1
+<span class="iter-stats">6 agents &middot; 15,775 tok &middot; 16,781ms &middot; $0.0329</span></div>
+<div class="cards-row"><div class="card" style="border-left:4px solid #2196F3">
+<div class="agent-name" style="color:#2196F3">Enrich With LLM</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,322</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>4,282</b>ms</span>
+<span class="metric cost"><b>$0.0027</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; enrich_with_llm</div>
+<div class="resp" title="[]">[]</div>
+</div>
+<div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>7,364</b> in &rarr; <b>94</b> out</span>
+<span class="metric"><b>3,509</b>ms</span>
+<span class="metric cost"><b>$0.0155</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The instruction says to open the eplatine app, then click &quot;">### Thought ### The instruction says to open the eplatine ap...</div>
+</div>
+<div class="card" style="border-left:4px solid #2196F3">
+<div class="agent-name" style="color:#2196F3">Enrich With LLM</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,472</b> in &rarr; <b>4</b> out</span>
+<span class="metric"><b>2,783</b>ms</span>
+<span class="metric cost"><b>$0.0030</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; enrich_with_llm</div>
+<div class="resp" title="[2]">[2]</div>
+</div>
+<div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>2,674</b> in &rarr; <b>59</b> out</span>
+<span class="metric"><b>2,467</b>ms</span>
+<span class="metric cost"><b>$0.0058</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The screen now displays the &quot;Entrez votre identifiant&quot;">### Thought ### The screen now displays the &quot;Entrez vot...</div>
+</div>
+<div class="card" style="border-left:4px solid #9C27B0">
+<div class="agent-name" style="color:#9C27B0">Planning Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,514</b> in &rarr; <b>64</b> out</span>
+<span class="metric"><b>1,820</b>ms</span>
+<span class="metric cost"><b>$0.0035</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; button  ⏳ Remaining: -">✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; bu...</div>
+</div>
+<div class="card" style="border-left:4px solid #4CAF50">
+<div class="agent-name" style="color:#4CAF50">Keypad Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,204</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>1,920</b>ms</span>
+<span class="metric cost"><b>$0.0024</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; SecureKeypadHandler.handle_secure_keypad &gt; SecureKeypadHandler.detect_secure_keypad</div>
+<div class="resp" title="NO">NO</div>
+</div>
+</div>
+</div>
+<div class="iteration">
+<div class="iter-header">Iteration 2
+<span class="iter-stats">5 agents &middot; 14,842 tok &middot; 13,024ms &middot; $0.0310</span></div>
+<div class="cards-row"><div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>7,670</b> in &rarr; <b>93</b> out</span>
+<span class="metric"><b>3,310</b>ms</span>
+<span class="metric cost"><b>$0.0161</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The Planning Remaining list says the first step is: &quot;Tap [I">### Thought ### The Planning Remaining list says the first s...</div>
+</div>
+<div class="card" style="border-left:4px solid #2196F3">
+<div class="agent-name" style="color:#2196F3">Enrich With LLM</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,475</b> in &rarr; <b>4</b> out</span>
+<span class="metric"><b>2,821</b>ms</span>
+<span class="metric cost"><b>$0.0030</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; enrich_with_llm</div>
+<div class="resp" title="[0]">[0]</div>
+</div>
+<div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>2,680</b> in &rarr; <b>47</b> out</span>
+<span class="metric"><b>2,827</b>ms</span>
+<span class="metric cost"><b>$0.0057</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The identifiant input field is focused and the keyboard is open,">### Thought ### The identifiant input field is focused and t...</div>
+</div>
+<div class="card" style="border-left:4px solid #9C27B0">
+<div class="agent-name" style="color:#9C27B0">Planning Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,598</b> in &rarr; <b>69</b> out</span>
+<span class="metric"><b>1,904</b>ms</span>
+<span class="metric cost"><b>$0.0037</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; button - Tap (955, 434">✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; bu...</div>
+</div>
+<div class="card" style="border-left:4px solid #4CAF50">
+<div class="agent-name" style="color:#4CAF50">Keypad Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,204</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>2,162</b>ms</span>
+<span class="metric cost"><b>$0.0024</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; SecureKeypadHandler.handle_secure_keypad &gt; SecureKeypadHandler.detect_secure_keypad</div>
+<div class="resp" title="NO">NO</div>
+</div>
+</div>
+</div>
+<div class="iteration">
+<div class="iter-header">Iteration 3
+<span class="iter-stats">5 agents &middot; 20,990 tok &middot; 14,506ms &middot; $0.0440</span></div>
+<div class="cards-row"><div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>7,591</b> in &rarr; <b>88</b> out</span>
+<span class="metric"><b>3,153</b>ms</span>
+<span class="metric cost"><b>$0.0159</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The first item in the Planning 'Remaining' list is &quot;Type K1">### Thought ### The first item in the Planning 'Remaining' l...</div>
+</div>
+<div class="card" style="border-left:4px solid #2196F3">
+<div class="agent-name" style="color:#2196F3">Enrich With LLM</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,378</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>2,773</b>ms</span>
+<span class="metric cost"><b>$0.0028</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; enrich_with_llm</div>
+<div class="resp" title="[]">[]</div>
+</div>
+<div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>2,537</b> in &rarr; <b>58</b> out</span>
+<span class="metric"><b>3,054</b>ms</span>
+<span class="metric cost"><b>$0.0055</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The identifiant &quot;K1373032&quot; is already entered, and the">### Thought ### The identifiant &quot;K1373032&quot; is alre...</div>
+</div>
+<div class="card" style="border-left:4px solid #9C27B0">
+<div class="agent-name" style="color:#9C27B0">Planning Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,626</b> in &rarr; <b>80</b> out</span>
+<span class="metric"><b>2,174</b>ms</span>
+<span class="metric cost"><b>$0.0039</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; button - Tap (955, 434">✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; bu...</div>
+</div>
+<div class="card" style="border-left:4px solid #E91E63">
+<div class="agent-name" style="color:#E91E63">Reflection Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>7,524</b> in &rarr; <b>106</b> out</span>
+<span class="metric"><b>3,352</b>ms</span>
+<span class="metric cost"><b>$0.0159</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The Planning 'Remaining' list shows the first step is &quot;Tap ">### Thought ### The Planning 'Remaining' list shows the firs...</div>
+</div>
+</div>
+</div>
+<div class="iteration">
+<div class="iter-header">Iteration 4
+<span class="iter-stats">4 agents &middot; 6,922 tok &middot; 9,929ms &middot; $0.0148</span></div>
+<div class="cards-row"><div class="card" style="border-left:4px solid #2196F3">
+<div class="agent-name" style="color:#2196F3">Enrich With LLM</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,422</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>3,152</b>ms</span>
+<span class="metric cost"><b>$0.0029</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; enrich_with_llm</div>
+<div class="resp" title="[]">[]</div>
+</div>
+<div class="card" style="border-left:4px solid #FF9800">
+<div class="agent-name" style="color:#FF9800">Action Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>2,474</b> in &rarr; <b>62</b> out</span>
+<span class="metric"><b>2,519</b>ms</span>
+<span class="metric cost"><b>$0.0054</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="### Thought ### The screen shows a loading message (&quot;Un instant s'il vous p">### Thought ### The screen shows a loading message (&quot;Un...</div>
+</div>
+<div class="card" style="border-left:4px solid #9C27B0">
+<div class="agent-name" style="color:#9C27B0">Planning Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,669</b> in &rarr; <b>87</b> out</span>
+<span class="metric"><b>2,138</b>ms</span>
+<span class="metric cost"><b>$0.0040</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; button - Tap (955, 434">✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; bu...</div>
+</div>
+<div class="card" style="border-left:4px solid #4CAF50">
+<div class="agent-name" style="color:#4CAF50">Keypad Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>1,204</b> in &rarr; <b>2</b> out</span>
+<span class="metric"><b>2,120</b>ms</span>
+<span class="metric cost"><b>$0.0024</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; SecureKeypadHandler.handle_secure_keypad &gt; SecureKeypadHandler.detect_secure_keypad</div>
+<div class="resp" title="YES">YES</div>
+</div>
+</div>
+</div>
+<div class="iteration">
+<div class="iter-header">Iteration 5
+<span class="iter-stats">4 agents &middot; 10,293 tok &middot; 16,374ms &middot; $0.0263</span></div>
+<div class="cards-row"><div class="card" style="border-left:4px solid #9C27B0">
+<div class="agent-name" style="color:#9C27B0">Planning Agent</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>2,163</b> in &rarr; <b>276</b> out</span>
+<span class="metric"><b>3,942</b>ms</span>
+<span class="metric cost"><b>$0.0065</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; azure_inference_chat</div>
+<div class="resp" title="✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; button - Tap (955, 434">✅ Completed: - Tap (959, 936) on &quot;Se connecter&quot; bu...</div>
+</div>
+<div class="card" style="border-left:4px solid #00BCD4">
+<div class="agent-name" style="color:#00BCD4">Generate Session</div>
+<div class="model">gpt-4.1</div>
+<div class="metrics">
+<span class="metric"><b>961</b> in &rarr; <b>137</b> out</span>
+<span class="metric"><b>2,738</b>ms</span>
+<span class="metric cost"><b>$0.0030</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; generate_session_report</div>
+<div class="resp" title="{   &quot;success&quot;: true,   &quot;completed&quot;: [     &quot;Tap on 'Se c">{   &quot;success&quot;: true,   &quot;completed&quot;: [   ...</div>
+</div>
+<div class="card" style="border-left:4px solid #FF5722">
+<div class="agent-name" style="color:#FF5722">Mobile Worker</div>
+<div class="model">gpt-4.1-2025-04-14</div>
+<div class="metrics">
+<span class="metric"><b>3,051</b> in &rarr; <b>327</b> out</span>
+<span class="metric"><b>4,822</b>ms</span>
+<span class="metric cost"><b>$0.0087</b></span>
+</div>
+<div class='chain'>mobile_worker_file</div>
+<div class="resp" title="{   &quot;steps&quot;: [&quot;step_1&quot;, &quot;step_2&quot;, &quot;step_3&quo">{   &quot;steps&quot;: [&quot;step_1&quot;, &quot;step_2&quo...</div>
+</div>
+<div class="card" style="border-left:4px solid #607D8B">
+<div class="agent-name" style="color:#607D8B">Filter Agent</div>
+<div class="model">AzureChatOpenAI</div>
+<div class="metrics">
+<span class="metric"><b>3,051</b> in &rarr; <b>327</b> out</span>
+<span class="metric"><b>4,872</b>ms</span>
+<span class="metric cost"><b>$0.0081</b></span>
+</div>
+<div class='chain'>mobile_worker_file &gt; filter_automation &gt; extract_direct_steps</div>
+<div class="resp" title="{   &quot;steps&quot;: [&quot;step_1&quot;, &quot;step_2&quot;, &quot;step_3&quo">{   &quot;steps&quot;: [&quot;step_1&quot;, &quot;step_2&quo...</div>
+</div>
+</div>
+</div>
+
+</div>
+<script>
+function exportSVG() {
+    var body = document.body;
+    var w = body.scrollWidth, h = body.scrollHeight;
+    var styles = '';
+    for (var s of document.querySelectorAll('style')) styles += s.innerHTML;
+    var html = body.innerHTML.replace(/<script[\s\S]*?<\/script>/gi, '');
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
+        + '<foreignObject width="100%" height="100%">'
+        + '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Segoe UI,sans-serif;background:#0f0f23;color:#ccc">'
+        + '<style>' + styles + '</style>' + html + '</div>'
+        + '</foreignObject></svg>';
+    var blob = new Blob([svg], {type: 'image/svg+xml'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'llminsight_trace.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+function exportPNG() {
+    var body = document.body;
+    var w = body.scrollWidth, h = body.scrollHeight;
+    var styles = '';
+    for (var s of document.querySelectorAll('style')) styles += s.innerHTML;
+    var html = body.innerHTML.replace(/<script[\s\S]*?<\/script>/gi, '');
+    var svgData = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
+        + '<foreignObject width="100%" height="100%">'
+        + '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Segoe UI,sans-serif;background:#0f0f23;color:#ccc">'
+        + '<style>' + styles + '</style>' + html + '</div>'
+        + '</foreignObject></svg>';
+    var canvas = document.createElement('canvas');
+    canvas.width = w * 2; canvas.height = h * 2;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(2, 2);
+    var img = new Image();
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        var a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'llminsight_trace.png';
+        a.click();
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+}
+</script>
+</body></html>

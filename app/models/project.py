@@ -21,18 +21,19 @@ class ProjectCategory(str, Enum):
 
 
 class ProjectTask(str, Enum):
-    generic= "generic"
+    generic = "generic"
     translation = "translation"
-    summarization="summarization"
-    code_generation="code_generation"
+    summarization = "summarization"
+    code_generation = "code_generation"
+    agent = "agent"
 
 
 REC_METRIC_TYPES = {
-    ProjectTask.generic : {MetricType.generic, MetricType.heuristic, MetricType.summarization_eval, MetricType.translation_eval, MetricType.code_eval, MetricType.RAG_eval},
-    ProjectTask.translation : {MetricType.heuristic, MetricType.translation_eval},
-    ProjectTask.summarization : {MetricType.heuristic, MetricType.summarization_eval},
-    ProjectTask.code_generation : {MetricType.heuristic, MetricType.code_eval},
-    
+    ProjectTask.generic: {MetricType.generic, MetricType.heuristic, MetricType.summarization_eval, MetricType.translation_eval, MetricType.code_eval, MetricType.RAG_eval},
+    ProjectTask.translation: {MetricType.heuristic, MetricType.translation_eval},
+    ProjectTask.summarization: {MetricType.heuristic, MetricType.summarization_eval},
+    ProjectTask.code_generation: {MetricType.heuristic, MetricType.code_eval},
+    ProjectTask.agent: {MetricType.generic, MetricType.heuristic, MetricType.agent_span, MetricType.agent_trace},
 }
 
 
@@ -41,40 +42,34 @@ REC_METRIC_TYPES = {
 
 class Project(Document):
     name:str
-    user_id: PydanticObjectId
+    # user_id: PydanticObjectId
+    client_id: str
     type: ProjectCategory
     task: Optional[ProjectTask] =None
     enabled_metrics:List[MetricName] = []
-    api_key: APIKey
+    #api_key: Optional[APIKey] = None
     created_at: datetime 
-    model_name:Optional[Literal["bert-base-uncased-cola"]] = None
     @model_validator(mode='after')
     def check_task(self):
-        if self.type== ProjectCategory.LLMObserve:
+        if self.type == ProjectCategory.LLMObserve:
             if not self.task:
                 raise ValueError(f"Task is required for category {self.type}")
-        
+
             for enabled_metric in self.enabled_metrics:
-                metric_is_allowed=False
+                metric_is_allowed = False
                 for metric_type in REC_METRIC_TYPES[self.task]:
                     if enabled_metric in METRIC_TYPE_TO_NAMES[metric_type]:
-                        metric_is_allowed=True
-                        
-                    if metric_is_allowed: 
+                        metric_is_allowed = True
+                    if metric_is_allowed:
                         break
-                if not metric_is_allowed:                    
+                if not metric_is_allowed:
                     raise ValueError(f"the metric {enabled_metric} is not compatible with the project task")
-        if self.type== ProjectCategory.LLMExplain:
-            if not self.model_name:
-                raise ValueError(f"Model name is required for category {self.type}")
-                    
-            
 
         return self
     class Settings:
         indexes = [
             [
-                ("user_id"),
+                ("client_id"),
                 ("type"),
             ],
         ]

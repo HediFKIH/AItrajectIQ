@@ -123,7 +123,7 @@ async def chat_completions(request: Request):
         Output= anonymized_response,
         Model=response.model,
         latency=latency,
-        n_tokens=response.usage.total_tokens
+        n_tokens=response.usage.completion_tokens
     )
 
     await add_response_data(log_id, data)

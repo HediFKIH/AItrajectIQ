@@ -17,8 +17,9 @@ from dotenv import load_dotenv
 import os 
 
 from comet import download_model, load_from_checkpoint
-
-
+from evaluation.runner import configure_eval_llm, EvalLLMConfig
+from evaluation.web_search import configure_search, SearchConfig
+import llminsight
 
 load_dotenv(dotenv_path="../.env")
 
@@ -29,6 +30,35 @@ model_path = download_model("Unbabel/wmt22-comet-da")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+
+    # Eval LLM — configurable via .env
+    # EVAL_LLM_PROVIDER: openai | azure | anthropic
+    # EVAL_LLM_MODEL:    gpt-4o, claude-3-5-sonnet, etc.
+    # EVAL_LLM_API_KEY:  API key for the eval provider
+    # EVAL_LLM_BASE_URL: (optional) for OpenAI-compatible APIs (Ollama, Groq, DeepSeek…)
+    eval_provider = os.getenv("EVAL_LLM_PROVIDER", "openai")
+    eval_api_key = os.getenv("EVAL_LLM_API_KEY", openai_api_key or "")
+    eval_model = os.getenv("EVAL_LLM_MODEL", "gpt-4o")
+
+    if eval_api_key:
+        configure_eval_llm(EvalLLMConfig(
+            provider=eval_provider,
+            model=eval_model,
+            api_key=eval_api_key,
+            base_url=os.getenv("EVAL_LLM_BASE_URL"),
+            azure_endpoint=os.getenv("EVAL_LLM_AZURE_ENDPOINT"),
+            azure_api_version=os.getenv("EVAL_LLM_AZURE_API_VERSION", "2024-02-15-preview"),
+        ))
+
+        
+
+    # Fact-check via web search (for generative LLM projects)
+    # FACT_CHECK_PROVIDER: none | tavily | serper | brave
+    # FACT_CHECK_API_KEY:  API key for the search provider
+    fact_provider = os.getenv("FACT_CHECK_PROVIDER", "none")
+    fact_api_key = os.getenv("FACT_CHECK_API_KEY", "")
+    configure_search(SearchConfig(provider=fact_provider, api_key=fact_api_key))
+
     # Load heavy resources ONCE
     # app.state.faiss_index = faiss.read_index("resources/recent_wiki.index")
     # app.state.category_index= faiss.read_index("resources/recent_category.index")
@@ -45,6 +75,8 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",  
     "https://localhost:5173", 
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
 ]
 
 

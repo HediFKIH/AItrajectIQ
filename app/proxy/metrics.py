@@ -1,8 +1,8 @@
+from utils.math_utils import cosine_similarity
 from models.metric import Metric, MetricName
 from models.log import Log
 from fastapi import HTTPException
 from pydantic import BaseModel
-from .math_utils import cosine_similarity
 import numpy as np
 import json
 import requests

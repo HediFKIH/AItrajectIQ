@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>LLMInsight - Trace Graph</title>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; }
+        #header {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            padding: 20px 30px; border-bottom: 2px solid #e94560;
+        }
+        #header h1 { font-size: 22px; color: #e94560; margin-bottom: 5px; }
+        #header p { font-size: 13px; color: #aaa; }
+        #graph { width: 100%; height: calc(100vh - 180px); }
+        #legend {
+            display: flex; gap: 20px; padding: 12px 30px;
+            background: #16213e; border-bottom: 1px solid #333;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+        #stats {
+            position: absolute; bottom: 15px; right: 20px; background: rgba(22,33,62,0.95);
+            border: 1px solid #444; border-radius: 8px; padding: 15px; font-size: 12px;
+            min-width: 200px;
+        }
+        #stats h3 { color: #e94560; margin-bottom: 8px; font-size: 14px; }
+        .row { display: flex; justify-content: space-between; margin: 3px 0; }
+        .val { color: #4fc3f7; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>LLMInsight - Trace Hierarchy Graph</h1>
+        <p>Trace: local-38114d3b4fd5 | Spans: 9</p>
+    </div>
+    <div id="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4CAF50"></div> Manager</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2196F3"></div> Worker</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#FF9800;border-radius:50%"></div> LLM Call</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9C27B0;transform:rotate(45deg)"></div> Tool</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#F44336"></div> Error</div>
+    </div>
+    <div id="graph"></div>
+    <div id="stats">
+        <h3>Stats</h3>
+        <div class="row"><span>Agents</span><span class="val">4</span></div>
+        <div class="row"><span>LLM calls</span><span class="val">4</span></div>
+        <div class="row"><span>Tools</span><span class="val">1</span></div>
+        <div class="row"><span>Total tokens</span><span class="val">4214</span></div>
+        <div class="row"><span>Total latency</span><span class="val">1178ms</span></div>
+    </div>
+    <script>
+        var nodes = new vis.DataSet([{"id": "span-290e03556526", "label": "gpt-4o-mini\n1004->161 tok\n147ms", "color": "#FF9800", "shape": "ellipse", "title": "Type: llm\nName: gpt-4o-mini\nSpan ID: span-290e03556526\nLatency: 147ms\nModel: gpt-4o-mini\nTokens in: 1004\nTokens out: 161", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-9875bd9e7b89", "label": "web_search\n124ms", "color": "#9C27B0", "shape": "diamond", "title": "Type: tool\nName: web_search\nSpan ID: span-9875bd9e7b89\nLatency: 124ms\nInput: {'query': 'Quel est le coût total de possession d'une Tesla ", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-b94711a1a40c", "label": "gpt-4o-mini\n488->197 tok\n402ms", "color": "#FF9800", "shape": "ellipse", "title": "Type: llm\nName: gpt-4o-mini\nSpan ID: span-b94711a1a40c\nLatency: 402ms\nModel: gpt-4o-mini\nTokens in: 488\nTokens out: 197", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-efd3e1bdcd4b", "label": "worker-recherche\n(worker)\n532ms", "color": "#2196F3", "shape": "box", "title": "Type: agent\nName: worker-recherche\nSpan ID: span-efd3e1bdcd4b\nLatency: 532ms\nRole: worker", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-b3aed156d1dc", "label": "gpt-4o-mini\n1348->55 tok\n246ms", "color": "#FF9800", "shape": "ellipse", "title": "Type: llm\nName: gpt-4o-mini\nSpan ID: span-b3aed156d1dc\nLatency: 246ms\nModel: gpt-4o-mini\nTokens in: 1348\nTokens out: 55", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-87137e49fb0f", "label": "worker-calcul\n(worker)\n251ms", "color": "#2196F3", "shape": "box", "title": "Type: agent\nName: worker-calcul\nSpan ID: span-87137e49fb0f\nLatency: 251ms\nRole: worker", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-2d154cd73f59", "label": "gpt-4o-mini\n889->72 tok\n230ms", "color": "#FF9800", "shape": "ellipse", "title": "Type: llm\nName: gpt-4o-mini\nSpan ID: span-2d154cd73f59\nLatency: 230ms\nModel: gpt-4o-mini\nTokens in: 889\nTokens out: 72", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-ef7b161e02bb", "label": "worker-redaction\n(worker)\n239ms", "color": "#2196F3", "shape": "box", "title": "Type: agent\nName: worker-redaction\nSpan ID: span-ef7b161e02bb\nLatency: 239ms\nRole: worker", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}, {"id": "span-05f1a590f647", "label": "manager\n(manager)\n1178ms", "color": "#4CAF50", "shape": "box", "title": "Type: agent\nName: manager\nSpan ID: span-05f1a590f647\nLatency: 1178ms\nRole: manager", "font": {"size": 12, "color": "#fff"}, "borderWidth": 2, "shadow": true}]);
+        var edges = new vis.DataSet([{"from": "span-05f1a590f647", "to": "span-290e03556526", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-efd3e1bdcd4b", "to": "span-9875bd9e7b89", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-efd3e1bdcd4b", "to": "span-b94711a1a40c", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-05f1a590f647", "to": "span-efd3e1bdcd4b", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-87137e49fb0f", "to": "span-b3aed156d1dc", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-05f1a590f647", "to": "span-87137e49fb0f", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-ef7b161e02bb", "to": "span-2d154cd73f59", "arrows": "to", "color": {"color": "#999"}, "width": 2}, {"from": "span-05f1a590f647", "to": "span-ef7b161e02bb", "arrows": "to", "color": {"color": "#999"}, "width": 2}]);
+        var container = document.getElementById('graph');
+        var data = { nodes: nodes, edges: edges };
+        var options = {
+            layout: {
+                hierarchical: {
+                    direction: 'UD',
+                    sortMethod: 'directed',
+                    levelSeparation: 120,
+                    nodeSpacing: 180,
+                }
+            },
+            physics: false,
+            interaction: {
+                hover: true,
+                tooltipDelay: 100,
+                navigationButtons: true,
+                keyboard: true,
+            },
+            nodes: { margin: 10 },
+        };
+        var network = new vis.Network(container, data, options);
+    </script>
+</body>
+</html>

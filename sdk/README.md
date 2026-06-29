@@ -1,0 +1,92 @@
+# LLMInsight SDK
+
+SDK Python d'observabilité pour applications LLM. Fonctionne avec **n'importe quelle application** — zéro code à ajouter.
+
+## Installation
+
+```bash
+pip install -e ./sdk
+```
+
+## Intégration — identique pour TOUS les projets
+
+```python
+import llminsight
+llminsight.init(project_id="...", api_key="...", base_url="http://localhost:8000")
+llminsight.patch()
+
+# C'est tout. Le reste du code est INCHANGÉ.
+```
+
+Ça fonctionne immédiatement avec :
+- OpenAI (sync + async)
+- Anthropic (sync + async)
+- Mistral
+- LangChain / LangGraph (callback auto-injecté)
+- N'importe quel framework qui utilise ces SDKs (CrewAI, AutoGen, etc.)
+
+## Ce qui se passe automatiquement
+
+```
+Votre application                          LLMInsight
+     │                                         │
+     ├─ appelle openai.create(...)              │
+     │   └── span capturé ──fire & forget──────→│── calcule le coût
+     │                                          │── évalue les métriques (async)
+     ├─ appelle anthropic.create(...)           │   ├── faithfulness
+     │   └── span capturé ──fire & forget──────→│   ├── hallucination
+     │                                          │   ├── answer_relevance
+     ├─ appelle openai.create(...)              │   ├── moderation
+     │   └── span capturé ──fire & forget──────→│   └── ... (19 métriques)
+     │                                          │
+     └── fin                                    │── dashboard : traces, coût, métriques
+```
+
+### Traces automatiques
+
+Si vous n'utilisez pas `with llminsight.trace(...)`, le SDK crée automatiquement une trace et y rattache tous les appels LLM. Les appels espacés de plus de 30 secondes créent une nouvelle trace.
+
+### Métriques
+
+Les métriques sont calculées **côté backend**, pas dans le SDK. Le SDK ne fait que capturer les données brutes. Le backend évalue automatiquement chaque réponse LLM selon les métriques configurées sur le projet :
+
+| Famille | Métriques |
+|---|---|
+| Générique | faithfulness, hallucination, answer_relevance, moderation |
+| RAG | context_precision, context_recall, contextual_faithfulness |
+| Résumé | summary_completeness, conciseness, compression_ratio |
+| Traduction | comet_score |
+| Code | compilable, code_relevance |
+| Heuristique | equals, contains, matches_regex, is_json |
+
+## Fonctionnalités optionnelles (pour plus de contrôle)
+
+### Traces manuelles (agents complexes)
+
+```python
+with llminsight.trace("mon-agent", {"user_id": "u-42"}):
+    resp1 = openai_client.chat.completions.create(...)   # span auto
+    resp2 = anthropic_client.messages.create(...)         # span auto
+```
+
+### Capture d'outils
+
+```python
+with llminsight.tool_span("web_search", {"query": "..."}):
+    results = search_web(query)
+```
+
+### Décorateur
+
+```python
+@llminsight.observe(name="planning")
+def plan(messages):
+    return openai_client.chat.completions.create(...)
+```
+
+## Ce que le SDK ne fait PAS
+
+- Ne voit jamais vos clés API fournisseur (OpenAI, Anthropic, etc.)
+- N'ajoute pas de latence à vos appels LLM (envoi fire-and-forget en thread daemon)
+- Ne modifie pas les réponses LLM (transparent)
+- Ne calcule pas les métriques (c'est le backend qui le fait)

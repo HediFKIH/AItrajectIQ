@@ -25,29 +25,31 @@ router = APIRouter(
 # Pydantic request schema
 class CreateProjectRequest(BaseModel):
     name:str
-    user_id: PydanticObjectId
+    # user_id: PydanticObjectId
+    client_id: str
     type: ProjectCategory
     task: Optional[ProjectTask] = None
     enabled_metrics: Optional[List[MetricName]] = []
-    api_key: APIKey
+    #api_key: Optional[APIKey] = None
     created_at: datetime = now_utc_plus_one()
-    model_name:Optional[Literal["bert-base-uncased-cola"]] = None
 
 
 
 
 @router.post("/", response_model=Project, status_code=status.HTTP_201_CREATED)
 async def create_project(project_data: CreateProjectRequest):
-    user = await User.get(project_data.user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    # If the user is in MongoDB, keep this. 
+    # If users are ONLY in PostgreSQL, you should remove this check or use a Postgres client check.
+    # user = await User.get(project_data.user_id)
+    # if not user:
+    #     raise HTTPException(status_code=404, detail="User not found")
     
     data = project_data.model_dump()
     project = Project(**data)
     await project.insert()
     return project
 
-@router.get("/", response_model=List[Project])
+""" @router.get("/", response_model=List[Project])
 async def list_projects(user_id=None):
     if not user_id in (None, ""):
         try:
@@ -58,7 +60,13 @@ async def list_projects(user_id=None):
         except exception:
             raise HTTPException(status_code=422, detail="Invalid user_id")
     return await Project.find_all().to_list()
+ """
 
+@router.get("/", response_model=List[Project])
+async def list_projects(client_id: Optional[str] = Query(None)):
+    if client_id:
+        return await Project.find(Project.client_id == client_id).to_list()
+    return await Project.find_all().to_list()
 
 @router.get("/{project_id}", response_model=Project)
 async def get_project(project_id: str):
@@ -71,7 +79,7 @@ async def get_project(project_id: str):
 
 class UpdateProjectRequest(BaseModel):
     name: Optional[str] =None
-    user_id: Optional[PydanticObjectId] =None
+    client_id: Optional[PydanticObjectId] =None
     type:Optional[ProjectCategory] = None
     task: Optional[ProjectTask] = None
     enabled_metrics:Optional[List[MetricName]] = None
