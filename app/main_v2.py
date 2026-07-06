@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     #eval_api_key = os.getenv("EVAL_LLM_API_KEY", "")
     #eval_model = os.getenv("EVAL_LLM_MODEL", "gpt-4o")
     eval_provider = os.getenv("EVAL_LLM_PROVIDER", "azure")
-    eval_api_key = os.getenv("API_KEY", "")    
+    eval_api_key = os.getenv("LLMINSIGHT_API_KEY", "")    
     eval_model = os.getenv("DEPLOYMENT_NAME", "gpt-4o-mini")
     azure_endpoint = os.getenv("AZURE_ENDPOINT", "")
     deployment_name = os.getenv("DEPLOYMENT_NAME", "")

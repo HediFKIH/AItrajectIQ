@@ -82,8 +82,21 @@ openai.resources.chat.completions.Completions.create = fake_create
 import llminsight
 
 llminsight.init(project_id=PROJECT_ID, api_key=API_KEY, base_url=BASE)
-llminsight.patch()
+
+# Guardrails: via SDK (à enregistrer AVANT patch())
+# - Input guardrails: bloquent AVANT l’appel
+# - Output guardrails: self-heal (retry) APRÈS l’appel
+#llminsight.add_guardrail("prompt_injection", threshold=0.5)
+#llminsight.add_guardrail("json_output")
 #llminsight.add_guardrail("cost_limit", max_cost_usd=0.10)
+#llminsight.add_guardrail("pii_detect")
+#llminsight.add_guardrail("prompt_leak")
+
+# Active l’instrumentation monkey-patching pour que l’exécution des appels LLM
+# applique automatiquement les guardrails ci-dessus.
+llminsight.patch()
+
+
 # ── 3. L'application agentique ──
 from openai import AzureOpenAI
 

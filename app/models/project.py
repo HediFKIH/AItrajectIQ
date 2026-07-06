@@ -47,7 +47,7 @@ class Project(Document):
     type: ProjectCategory
     task: Optional[ProjectTask] =None
     enabled_metrics:List[MetricName] = []
-    #api_key: Optional[APIKey] = None
+    api_key: Optional[APIKey] = None
     created_at: datetime 
     @model_validator(mode='after')
     def check_task(self):
