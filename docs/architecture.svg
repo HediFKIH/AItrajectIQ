@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 740" role="img" aria-labelledby="title desc">
   <title id="title">AItrajectIQ architecture</title>
   <desc id="desc">Your application and SDK send spans fire-and-forget to the FastAPI backend and MongoDB. The evaluation engine scores runs. The dashboard shows traces, costs and recommendations.</desc>
   <defs>
-    <linearGradient id="page" x1="0" y1="0" x2="1200" y2="720" gradientUnits="userSpaceOnUse">
+    <linearGradient id="page" x1="0" y1="0" x2="1320" y2="740" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#12081f"/>
       <stop offset="1" stop-color="#07040e"/>
     </linearGradient>
@@ -11,15 +11,15 @@
       <stop offset="0" stop-color="#a78bfa"/>
       <stop offset="1" stop-color="#4c1d95"/>
     </linearGradient>
-    <linearGradient id="card-app" x1="48" y1="132" x2="384" y2="588" gradientUnits="userSpaceOnUse">
+    <linearGradient id="card-app" x1="32" y1="108" x2="412" y2="560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#12262c"/>
       <stop offset="1" stop-color="#0c161c"/>
     </linearGradient>
-    <linearGradient id="card-back" x1="432" y1="132" x2="768" y2="588" gradientUnits="userSpaceOnUse">
+    <linearGradient id="card-back" x1="508" y1="108" x2="888" y2="560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#1c1233"/>
       <stop offset="1" stop-color="#120c22"/>
     </linearGradient>
-    <linearGradient id="card-ins" x1="816" y1="132" x2="1152" y2="588" gradientUnits="userSpaceOnUse">
+    <linearGradient id="card-ins" x1="984" y1="108" x2="1288" y2="560" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#2a1c10"/>
       <stop offset="1" stop-color="#16100c"/>
     </linearGradient>
@@ -35,166 +35,159 @@
       <stop offset="0" stop-color="#fcd34d"/>
       <stop offset="1" stop-color="#f59e0b"/>
     </linearGradient>
-    <filter id="glow-cyan" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="6" result="b"/>
+    <filter id="glow-cyan" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="glow-violet" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="7" result="b"/>
+    <filter id="glow-violet" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 L10 5 L0 10 z" fill="#67e8f9"/>
     </marker>
-    <marker id="arrow-violet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <marker id="arrow-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 L10 5 L0 10 z" fill="#c4b5fd"/>
     </marker>
     <style type="text/css">
       <![CDATA[
-      .flow { stroke-dasharray: 10 14; animation: dash 1.4s linear infinite; }
-      .flow-slow { stroke-dasharray: 8 16; animation: dash 2.2s linear infinite; }
+      .flow { stroke-dasharray: 8 12; animation: dash 1.4s linear infinite; }
+      .flow-slow { stroke-dasharray: 8 14; animation: dash 2s linear infinite; }
       .pulse { animation: pulse 2.4s ease-in-out infinite; }
       .pulse-2 { animation: pulse 2.4s ease-in-out 0.8s infinite; }
       .pulse-3 { animation: pulse 2.4s ease-in-out 1.6s infinite; }
-      .chip { animation: chip 3s ease-in-out infinite; }
-      @keyframes dash { to { stroke-dashoffset: -24; } }
+      @keyframes dash { to { stroke-dashoffset: -20; } }
       @keyframes pulse {
-        0%, 100% { opacity: 0.35; }
-        50% { opacity: 1; }
-      }
-      @keyframes chip {
-        0%, 100% { opacity: 0.7; }
-        50% { opacity: 1; }
+        0%, 100% { opacity: 0.28; }
+        50% { opacity: 0.85; }
       }
       ]]>
     </style>
   </defs>
 
-  <rect width="1200" height="720" rx="28" fill="url(#page)"/>
-  <g opacity="0.18" stroke="#8b5cf6" stroke-width="1">
-    <path d="M0 180 H1200 M0 360 H1200 M0 540 H1200 M240 0 V720 M480 0 V720 M720 0 V720 M960 0 V720"/>
-  </g>
-  <circle class="pulse" cx="200" cy="80" r="120" fill="#22d3ee" opacity="0.08"/>
-  <circle class="pulse-2" cx="600" cy="80" r="140" fill="#8b5cf6" opacity="0.12"/>
-  <circle class="pulse-3" cx="1000" cy="80" r="120" fill="#f59e0b" opacity="0.08"/>
+  <rect width="1320" height="740" rx="28" fill="url(#page)"/>
 
-  <g transform="translate(36 28)">
+  <g transform="translate(32 24)">
     <rect width="36" height="36" rx="9" fill="url(#mark)"/>
-    <g transform="translate(2 2) scale(1)">
-      <path d="M8 23C12 23 13 16.5 16.5 16.5S21 9.5 24 9.5" fill="none" stroke="#fff" stroke-width="2.75" stroke-linecap="round"/>
-      <circle cx="8" cy="23" r="2.7" fill="#fff"/>
-      <circle cx="16.5" cy="16.5" r="2.5" fill="#fff"/>
-      <circle cx="24" cy="9.5" r="4.35" fill="none" stroke="#fff" stroke-width="2"/>
-      <circle cx="24" cy="9.5" r="1.7" fill="#fff"/>
-    </g>
-    <text x="48" y="24" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="22" font-weight="700">AItraject<tspan fill="#c4b5fd">IQ</tspan></text>
-    <text x="48" y="42" fill="#94a3b8" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="2.4">AGENTIC WORKFLOW OBSERVABILITY</text>
+    <path d="M9 25C13 25 14 18.5 17.5 18.5S22 11.5 25 11.5" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="9" cy="25" r="2.4" fill="#fff"/>
+    <circle cx="17.5" cy="18.5" r="2.2" fill="#fff"/>
+    <circle cx="25" cy="11.5" r="3.8" fill="none" stroke="#fff" stroke-width="1.8"/>
+    <circle cx="25" cy="11.5" r="1.5" fill="#fff"/>
+    <text x="48" y="16" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="20" font-weight="700">AItraject<tspan fill="#c4b5fd">IQ</tspan></text>
+    <text x="48" y="34" fill="#94a3b8" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="10" font-weight="600" letter-spacing="1.6">AGENTIC WORKFLOW OBSERVABILITY</text>
   </g>
-  <text x="1164" y="50" text-anchor="end" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Trace every path. Understand every action.</text>
+  <text x="1288" y="46" text-anchor="end" fill="#94a3b8" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12">Trace every path. Understand every action.</text>
 
-  <path id="p1" d="M384 300 C408 300 408 300 432 300" fill="none" stroke="#67e8f9" stroke-width="3" marker-end="url(#arrow-cyan)" class="flow" filter="url(#glow-cyan)"/>
-  <path id="p2" d="M768 300 C792 300 792 300 816 300" fill="none" stroke="#c4b5fd" stroke-width="3" marker-end="url(#arrow-violet)" class="flow-slow" filter="url(#glow-violet)"/>
+  <!-- Cards first so arrows and labels sit in the gutters only -->
+  <g class="pulse">
+    <rect x="32" y="88" width="380" height="456" rx="20" fill="none" stroke="#22d3ee" stroke-width="2"/>
+  </g>
+  <rect x="32" y="88" width="380" height="456" rx="20" fill="url(#card-app)" stroke="#22d3ee" stroke-opacity="0.5" stroke-width="1.4"/>
+  <rect x="32" y="88" width="7" height="456" rx="4" fill="url(#cyan)"/>
+  <text x="54" y="118" fill="#67e8f9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">YOUR APPLICATION</text>
+  <rect x="52" y="136" width="340" height="86" rx="12" fill="#071016" stroke="#164e63"/>
+  <text x="68" y="162" fill="#5eead4" font-family="Consolas, ui-monospace, monospace" font-size="13">import aitrajectiq</text>
+  <text x="68" y="184" fill="#99f6e4" font-family="Consolas, ui-monospace, monospace" font-size="13">aitrajectiq.init(api_key=...)</text>
+  <text x="68" y="206" fill="#ccfbf1" font-family="Consolas, ui-monospace, monospace" font-size="13">aitrajectiq.patch()</text>
+  <rect x="52" y="238" width="340" height="198" rx="14" fill="#0a1c22" stroke="#155e75"/>
+  <text x="68" y="268" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">SDK - aitrajectiq</text>
+  <circle cx="76" cy="300" r="4" fill="#22d3ee"/>
+  <text x="90" y="305" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Patches LLM providers</text>
+  <circle cx="76" cy="328" r="4" fill="#22d3ee"/>
+  <text x="90" y="333" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Captures spans live</text>
+  <circle cx="76" cy="356" r="4" fill="#22d3ee"/>
+  <text x="90" y="361" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Auto-creates traces</text>
+  <circle cx="76" cy="384" r="4" fill="#22d3ee"/>
+  <text x="90" y="389" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Zero extra latency</text>
+  <g font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="600">
+    <rect x="52" y="456" width="68" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
+    <text x="86" y="473" text-anchor="middle" fill="#a5f3fc">Cursor</text>
+    <rect x="128" y="456" width="92" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
+    <text x="174" y="473" text-anchor="middle" fill="#a5f3fc">Claude Code</text>
+    <rect x="228" y="456" width="108" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
+    <text x="282" y="473" text-anchor="middle" fill="#a5f3fc">OpenTelemetry</text>
+  </g>
 
-  <circle r="5" fill="#67e8f9" filter="url(#glow-cyan)">
-    <animateMotion dur="1.6s" repeatCount="indefinite" path="M384 300 C408 300 408 300 432 300"/>
+  <g class="pulse-2">
+    <rect x="508" y="88" width="380" height="456" rx="20" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+  </g>
+  <rect x="508" y="88" width="380" height="456" rx="20" fill="url(#card-back)" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="1.4"/>
+  <rect x="508" y="88" width="7" height="456" rx="4" fill="url(#violet)"/>
+  <text x="530" y="118" fill="#c4b5fd" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">BACKEND</text>
+  <text x="530" y="156" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="22" font-weight="700">FastAPI</text>
+  <text x="530" y="178" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Ingest, store, evaluate - async</text>
+  <g font-family="Consolas, ui-monospace, monospace" font-size="13" fill="#e9d5ff">
+    <rect x="528" y="200" width="340" height="34" rx="8" fill="#1e1038" stroke="#6d28d9"/>
+    <text x="544" y="222">POST /ingest/span</text>
+    <rect x="528" y="242" width="340" height="34" rx="8" fill="#1e1038" stroke="#6d28d9"/>
+    <text x="544" y="264">POST /ingest/log</text>
+    <rect x="528" y="284" width="340" height="34" rx="8" fill="#1e1038" stroke="#6d28d9"/>
+    <text x="544" y="306">POST /otel/v1/traces</text>
+    <rect x="528" y="326" width="340" height="34" rx="8" fill="#1e1038" stroke="#6d28d9"/>
+    <text x="544" y="348">MCP /mcp</text>
+  </g>
+  <rect x="528" y="380" width="340" height="132" rx="14" fill="#160c28" stroke="#7c3aed"/>
+  <ellipse cx="572" cy="422" rx="26" ry="11" fill="#4c1d95" stroke="#c4b5fd"/>
+  <rect x="546" y="422" width="52" height="34" fill="#4c1d95"/>
+  <ellipse cx="572" cy="456" rx="26" ry="11" fill="#6d28d9" stroke="#c4b5fd"/>
+  <text x="616" y="436" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">MongoDB</text>
+  <text x="616" y="458" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12">traces / spans / keys</text>
+
+  <g class="pulse-3">
+    <rect x="984" y="88" width="304" height="456" rx="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  </g>
+  <rect x="984" y="88" width="304" height="456" rx="20" fill="url(#card-ins)" stroke="#f59e0b" stroke-opacity="0.5" stroke-width="1.4"/>
+  <rect x="984" y="88" width="7" height="456" rx="4" fill="url(#amber)"/>
+  <text x="1006" y="118" fill="#fcd34d" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.6">INSIGHTS</text>
+  <rect x="1004" y="136" width="264" height="186" rx="14" fill="#1c1408" stroke="#b45309"/>
+  <text x="1020" y="164" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15" font-weight="700">Evaluation engine</text>
+  <circle cx="1028" cy="192" r="4" fill="#f59e0b"/>
+  <text x="1042" y="197" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Span and trace metrics</text>
+  <circle cx="1028" cy="220" r="4" fill="#f59e0b"/>
+  <text x="1042" y="225" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Judge LLM</text>
+  <circle cx="1028" cy="248" r="4" fill="#f59e0b"/>
+  <text x="1042" y="253" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Web search fact-check</text>
+  <circle cx="1028" cy="276" r="4" fill="#f59e0b"/>
+  <text x="1042" y="281" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Harness recommendations</text>
+  <rect x="1004" y="338" width="264" height="174" rx="14" fill="#1c1408" stroke="#b45309"/>
+  <text x="1020" y="366" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="15" font-weight="700">Dashboard</text>
+  <circle cx="1028" cy="394" r="4" fill="#fbbf24"/>
+  <text x="1042" y="399" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Live traces</text>
+  <circle cx="1028" cy="422" r="4" fill="#fbbf24"/>
+  <text x="1042" y="427" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Costs per model</text>
+  <circle cx="1028" cy="450" r="4" fill="#fbbf24"/>
+  <text x="1042" y="455" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Cursor and Claude rules</text>
+
+  <!-- Gutter 1: 412 to 508 (96px). Labels stay inside. -->
+  <path d="M414 318 L496 318" fill="none" stroke="#67e8f9" stroke-width="3" marker-end="url(#arrow-cyan)" class="flow" filter="url(#glow-cyan)"/>
+  <circle r="4.5" fill="#67e8f9" filter="url(#glow-cyan)">
+    <animateMotion dur="1.6s" repeatCount="indefinite" path="M414 318 L496 318"/>
   </circle>
-  <circle r="5" fill="#e9d5ff" filter="url(#glow-violet)">
-    <animateMotion dur="2s" repeatCount="indefinite" path="M768 300 C792 300 792 300 816 300"/>
+  <rect x="418" y="268" width="80" height="36" rx="8" fill="#071016" stroke="#22d3ee"/>
+  <text x="458" y="282" text-anchor="middle" fill="#67e8f9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="10" font-weight="700">fire-and</text>
+  <text x="458" y="296" text-anchor="middle" fill="#67e8f9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="10" font-weight="700">forget</text>
+
+  <!-- Gutter 2: 888 to 984 (96px). -->
+  <path d="M890 318 L972 318" fill="none" stroke="#c4b5fd" stroke-width="3" marker-end="url(#arrow-violet)" class="flow-slow" filter="url(#glow-violet)"/>
+  <circle r="4.5" fill="#e9d5ff" filter="url(#glow-violet)">
+    <animateMotion dur="2s" repeatCount="indefinite" path="M890 318 L972 318"/>
   </circle>
+  <rect x="894" y="268" width="80" height="36" rx="8" fill="#12081f" stroke="#a78bfa"/>
+  <text x="934" y="282" text-anchor="middle" fill="#c4b5fd" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="10" font-weight="700">score and</text>
+  <text x="934" y="296" text-anchor="middle" fill="#c4b5fd" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="10" font-weight="700">advise</text>
 
-  <text x="408" y="278" fill="#67e8f9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="600">fire-and-forget</text>
-  <text x="792" y="278" text-anchor="end" fill="#c4b5fd" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="600">score and advise</text>
-
-  <g class="pulse" opacity="0.9">
-    <rect x="48" y="96" width="336" height="452" rx="22" fill="none" stroke="#22d3ee" stroke-width="2" opacity="0.35"/>
-  </g>
-  <rect x="48" y="96" width="336" height="452" rx="22" fill="url(#card-app)" stroke="#22d3ee" stroke-opacity="0.45" stroke-width="1.5"/>
-  <rect x="48" y="96" width="8" height="452" rx="4" fill="url(#cyan)"/>
-  <text x="72" y="128" fill="#67e8f9" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">YOUR APPLICATION</text>
-  <rect x="68" y="148" width="296" height="92" rx="12" fill="#071016" stroke="#164e63"/>
-  <text x="84" y="174" fill="#5eead4" font-family="Consolas, ui-monospace, monospace" font-size="13">import aitrajectiq</text>
-  <text x="84" y="196" fill="#99f6e4" font-family="Consolas, ui-monospace, monospace" font-size="13">aitrajectiq.init(api_key="atq_...")</text>
-  <text x="84" y="218" fill="#ccfbf1" font-family="Consolas, ui-monospace, monospace" font-size="13">aitrajectiq.patch()</text>
-  <rect x="68" y="256" width="296" height="200" rx="14" fill="#0a1c22" stroke="#155e75"/>
-  <text x="84" y="286" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">SDK - aitrajectiq</text>
-  <circle cx="92" cy="318" r="4" fill="#22d3ee"/>
-  <text x="106" y="323" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Patches LLM providers</text>
-  <circle cx="92" cy="348" r="4" fill="#22d3ee"/>
-  <text x="106" y="353" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Captures spans live</text>
-  <circle cx="92" cy="378" r="4" fill="#22d3ee"/>
-  <text x="106" y="383" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Auto-creates traces</text>
-  <circle cx="92" cy="408" r="4" fill="#22d3ee"/>
-  <text x="106" y="413" fill="#e2e8f0" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Zero extra latency</text>
-  <g font-family="Segoe UI, Inter, Arial, sans-serif" font-size="11" font-weight="600" class="chip">
-    <rect x="68" y="476" width="72" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
-    <text x="104" y="493" text-anchor="middle" fill="#a5f3fc">Cursor</text>
-    <rect x="148" y="476" width="96" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
-    <text x="196" y="493" text-anchor="middle" fill="#a5f3fc">Claude Code</text>
-    <rect x="252" y="476" width="112" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
-    <text x="308" y="493" text-anchor="middle" fill="#a5f3fc">OpenTelemetry</text>
-  </g>
-
-  <g class="pulse-2" opacity="0.9">
-    <rect x="432" y="96" width="336" height="452" rx="22" fill="none" stroke="#8b5cf6" stroke-width="2" opacity="0.4"/>
-  </g>
-  <rect x="432" y="96" width="336" height="452" rx="22" fill="url(#card-back)" stroke="#8b5cf6" stroke-opacity="0.5" stroke-width="1.5"/>
-  <rect x="432" y="96" width="8" height="452" rx="4" fill="url(#violet)"/>
-  <text x="456" y="128" fill="#c4b5fd" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">BACKEND</text>
-  <text x="456" y="168" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="22" font-weight="700">FastAPI</text>
-  <text x="456" y="192" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Ingest, store, evaluate - async</text>
-  <g font-family="Consolas, ui-monospace, monospace" font-size="12" fill="#e9d5ff">
-    <rect x="456" y="216" width="288" height="32" rx="8" fill="#1e1038" stroke="#6d28d9"/>
-    <text x="472" y="236">POST /ingest/span</text>
-    <rect x="456" y="256" width="288" height="32" rx="8" fill="#1e1038" stroke="#6d28d9"/>
-    <text x="472" y="276">POST /ingest/log</text>
-    <rect x="456" y="296" width="288" height="32" rx="8" fill="#1e1038" stroke="#6d28d9"/>
-    <text x="472" y="316">POST /otel/v1/traces</text>
-    <rect x="456" y="336" width="288" height="32" rx="8" fill="#1e1038" stroke="#6d28d9"/>
-    <text x="472" y="356">MCP  /mcp</text>
-  </g>
-  <rect x="456" y="392" width="288" height="120" rx="14" fill="#160c28" stroke="#7c3aed"/>
-  <ellipse cx="500" cy="430" rx="28" ry="12" fill="#4c1d95" stroke="#c4b5fd"/>
-  <rect x="472" y="430" width="56" height="36" fill="#4c1d95"/>
-  <ellipse cx="500" cy="466" rx="28" ry="12" fill="#6d28d9" stroke="#c4b5fd"/>
-  <text x="548" y="444" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">MongoDB</text>
-  <text x="548" y="468" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12">traces / spans / keys</text>
-
-  <g class="pulse-3" opacity="0.9">
-    <rect x="816" y="96" width="336" height="452" rx="22" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.35"/>
-  </g>
-  <rect x="816" y="96" width="336" height="452" rx="22" fill="url(#card-ins)" stroke="#f59e0b" stroke-opacity="0.5" stroke-width="1.5"/>
-  <rect x="816" y="96" width="8" height="452" rx="4" fill="url(#amber)"/>
-  <text x="840" y="128" fill="#fcd34d" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.8">INSIGHTS</text>
-  <rect x="836" y="148" width="296" height="188" rx="14" fill="#1c1408" stroke="#b45309"/>
-  <text x="852" y="178" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">Evaluation engine</text>
-  <circle cx="860" cy="208" r="4" fill="#f59e0b"/>
-  <text x="874" y="213" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Span and trace metrics</text>
-  <circle cx="860" cy="238" r="4" fill="#f59e0b"/>
-  <text x="874" y="243" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Judge LLM</text>
-  <circle cx="860" cy="268" r="4" fill="#f59e0b"/>
-  <text x="874" y="273" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Web search fact-check</text>
-  <circle cx="860" cy="298" r="4" fill="#f59e0b"/>
-  <text x="874" y="303" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Harness recommendations</text>
-  <rect x="836" y="352" width="296" height="160" rx="14" fill="#1c1408" stroke="#b45309"/>
-  <text x="852" y="382" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="16" font-weight="700">Dashboard</text>
-  <circle cx="860" cy="412" r="4" fill="#fbbf24"/>
-  <text x="874" y="417" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Live traces and waterfall</text>
-  <circle cx="860" cy="442" r="4" fill="#fbbf24"/>
-  <text x="874" y="447" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Costs per model</text>
-  <circle cx="860" cy="472" r="4" fill="#fbbf24"/>
-  <text x="874" y="477" fill="#fde68a" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13">Rules for Cursor and Claude</text>
-
-  <rect x="48" y="568" width="1104" height="116" rx="18" fill="#10081c" stroke="#4c1d95"/>
-  <text x="72" y="604" fill="#e9d5ff" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="13" font-weight="700" letter-spacing="1.6">ONE PROJECT KEY  -  EVERY PATH</text>
-  <text x="72" y="632" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="14">SDK / OpenTelemetry / MCP  -  ingest  -  evaluate  -  recommend. Nothing blocks the LLM call.</text>
+  <rect x="32" y="564" width="1256" height="148" rx="18" fill="#10081c" stroke="#4c1d95"/>
+  <text x="56" y="598" fill="#e9d5ff" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">ONE PROJECT KEY  -  EVERY PATH</text>
+  <text x="56" y="624" fill="#cbd5e1" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="14">SDK / OpenTelemetry / MCP capture a run. The backend stores it, evaluates it, then recommends a fix. Nothing blocks the LLM call.</text>
   <g font-family="Segoe UI, Inter, Arial, sans-serif" font-size="12" font-weight="600">
-    <rect x="72" y="648" width="88" height="22" rx="11" fill="#22d3ee" opacity="0.2"/>
-    <text x="116" y="663" text-anchor="middle" fill="#a5f3fc">1. Capture</text>
-    <rect x="172" y="648" width="88" height="22" rx="11" fill="#8b5cf6" opacity="0.25"/>
-    <text x="216" y="663" text-anchor="middle" fill="#ddd6fe">2. Store</text>
-    <rect x="272" y="648" width="100" height="22" rx="11" fill="#f59e0b" opacity="0.22"/>
-    <text x="322" y="663" text-anchor="middle" fill="#fde68a">3. Evaluate</text>
-    <rect x="384" y="648" width="120" height="22" rx="11" fill="#f472b6" opacity="0.2"/>
-    <text x="444" y="663" text-anchor="middle" fill="#fbcfe8">4. Recommend</text>
+    <rect x="56" y="648" width="100" height="26" rx="13" fill="#083344" stroke="#22d3ee"/>
+    <text x="106" y="666" text-anchor="middle" fill="#a5f3fc">1. Capture</text>
+    <rect x="168" y="648" width="88" height="26" rx="13" fill="#2e1065" stroke="#a78bfa"/>
+    <text x="212" y="666" text-anchor="middle" fill="#ddd6fe">2. Store</text>
+    <rect x="268" y="648" width="104" height="26" rx="13" fill="#451a03" stroke="#f59e0b"/>
+    <text x="320" y="666" text-anchor="middle" fill="#fde68a">3. Evaluate</text>
+    <rect x="384" y="648" width="124" height="26" rx="13" fill="#4a044e" stroke="#f472b6"/>
+    <text x="446" y="666" text-anchor="middle" fill="#fbcfe8">4. Recommend</text>
   </g>
 </svg>
