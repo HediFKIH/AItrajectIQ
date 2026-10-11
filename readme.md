@@ -29,32 +29,11 @@ AItrajectIQ is a full-stack platform that helps you monitor, trace, and evaluate
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    YOUR APPLICATION                          │
-│                                                             │
-│   import aitrajectiq                                         │
-│   aitrajectiq.init(project_id="...", api_key="...")          │
-│   aitrajectiq.patch()                                        │
-│   # ... your LLM calls ...                                  │
-│                                                             │
-│   ┌──────────────────┐     fire-and-forget     ┌──────────┐│
-│   │  SDK (aitrajectiq) │ ───────────────────────→│ Backend  ││
-│   │  • patches LLM   │    POST /ingest/span     │ (FastAPI)││
-│   │  • captures spans│    POST /ingest/log      │          ││
-│   │  • auto-creates  │    POST /ingest/trace/*  │ MongoDB  ││
-│   │    traces        │                          │          ││
-│   └──────────────────┘                          └────┬─────┘│
-└───────────────────────────────────────────────────────┼─────┘
-                                                        │
-                                              ┌─────────▼─────────┐
-                                              │  EVALUATION ENGINE │
-                                              │  • Span metrics    │
-                                              │  • Trace metrics   │
-                                              │  • Log metrics     │
-                                              │  • Web search      │
-                                              └───────────────────┘
-```
+<p align="center">
+  <img src="docs/architecture.svg" alt="AItrajectIQ architecture: application and SDK send spans fire-and-forget to FastAPI and MongoDB, then the evaluation engine and dashboard." width="100%">
+</p>
+
+Open [`docs/architecture.svg`](docs/architecture.svg) in a browser to see the motion (packets on the fire-and-forget path, pulsing cards).
 
 Besides the SDK, any OpenTelemetry-instrumented application (any language) can send traces to `/otel/v1/traces`, and MCP clients (Cursor, Claude, ...) can query the results at `/mcp`. Every path is authenticated with a project API key.
 
