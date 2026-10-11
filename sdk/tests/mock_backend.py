@@ -1,5 +1,5 @@
 """
-Mini serveur backend de test pour le SDK LLMInsight.
+Mini serveur backend de test pour le SDK AItrajectIQ.
 Reçoit les spans et traces, les affiche dans le terminal.
 
 Lancer avec : python tests/mock_backend.py
@@ -11,7 +11,7 @@ from datetime import datetime
 import uvicorn
 import json
 
-app = FastAPI(title="LLMInsight Mock Backend")
+app = FastAPI(title="AItrajectIQ Mock Backend")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 traces = {}
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8090)
     args = parser.parse_args()
     print("\n" + "="*60)
-    print(f"  LLMInsight Mock Backend")
+    print(f"  AItrajectIQ Mock Backend")
     print(f"  http://localhost:{args.port}")
     print("  Prêt à recevoir les spans du SDK")
     print("="*60 + "\n")

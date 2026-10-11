@@ -6,7 +6,7 @@ router = APIRouter(prefix="/help", tags=["Help"])
 
 @router.get("/metrics-pdf")
 async def metrics_pdf():
-    filename = "LLMInsight_Metrics_Reference.pdf"
+    filename = "AItrajectIQ_Metrics_Reference.pdf"
 
     # Use absolute path relative to this file, so it works regardless of working directory
     pdf_path = Path(__file__).resolve().parents[2] / filename  # app/routes/ -> app/ -> project root

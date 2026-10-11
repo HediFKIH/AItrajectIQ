@@ -6,7 +6,7 @@ Pas besoin de clé OpenAI — tout est simulé.
 Lancer : python tests/test_agent.py
 """
 
-import llminsight
+import aitrajectiq
 import time
 import openai
 
@@ -47,9 +47,9 @@ def fake_openai_create(self=None, **kwargs):
 
 
 # ── Setup SDK ──
-llminsight.init(project_id="flow-ai-mobile", api_key="test-key-123", base_url="http://localhost:8090")
+aitrajectiq.init(project_id="flow-ai-mobile", api_key="test-key-123", base_url="http://localhost:8090")
 openai.resources.chat.completions.Completions.create = fake_openai_create
-llminsight.patch()
+aitrajectiq.patch()
 
 client = openai.OpenAI(api_key="fake", base_url="http://localhost:1/v1")
 
@@ -57,20 +57,20 @@ client = openai.OpenAI(api_key="fake", base_url="http://localhost:1/v1")
 # ── Un run complet d'agent ──
 print("=== Flow AI Mobile — Scénario de test ===\n")
 
-with llminsight.trace("mobile-scenario", {
+with aitrajectiq.trace("mobile-scenario", {
     "instruction": "Se connecter à l'application bancaire",
     "device_id": "pixel-7",
     "platform": "android",
 }):
     # Step 1 : capture d'écran
     print("Step 0: Screenshot...")
-    with llminsight.tool_span("screenshot", {"device_id": "pixel-7"}) as cap:
+    with aitrajectiq.tool_span("screenshot", {"device_id": "pixel-7"}) as cap:
         time.sleep(0.2)
         cap.set_output("screenshot_pixel7_1280x720.png")
 
     # Step 2 : perception OCR
     print("Step 1: Perception OCR + GroundingDINO...")
-    with llminsight.tool_span("perception", {"model": "GroundingDINO + EasyOCR"}) as cap:
+    with aitrajectiq.tool_span("perception", {"model": "GroundingDINO + EasyOCR"}) as cap:
         time.sleep(0.5)
         cap.set_output("ocr=12 icons=3 fields=2 [button:Login, field:Email, field:Password]")
 
@@ -87,7 +87,7 @@ with llminsight.trace("mobile-scenario", {
 
     # Step 4 : exécution sur device
     print("Step 3: Device tap...")
-    with llminsight.tool_span("device_tap", {"element": "Email", "coords": [234, 456]}) as cap:
+    with aitrajectiq.tool_span("device_tap", {"element": "Email", "coords": [234, 456]}) as cap:
         time.sleep(0.1)
         cap.set_output("tap success")
 

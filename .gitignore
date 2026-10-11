@@ -1,5 +1,44 @@
+# Secrets
 .env
+.env.*
+!.env.example
+.cursor/mcp.json
+.aitrajectiq/
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*.egg-info/
+build/
+dist/
 .venv/
+.venv-*/
+venv/
+.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dashboard/dist/
+interface/dist/
+
+# Runtime caches and generated output
+app/.cache/
+app/results.txt
+.aitrajectiq_last_spans.json
+.llminsight_last_spans.json
+*_report.html
+trace_graph.html
+prune_report.html
+prompt_baseline.json
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

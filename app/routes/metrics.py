@@ -2,7 +2,7 @@
 Metrics aggregation routes — time series for the dashboard.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from beanie import PydanticObjectId
 from typing import Optional
 from datetime import datetime, timedelta
@@ -10,12 +10,15 @@ from datetime import datetime, timedelta
 from models.span import Span, SpanType
 from models.trace import Trace
 from models.metric import MetricName
+from security.api_keys import READ, authenticate
+from services.insights import current_verdicts_stage, metrics_summary
 
 router = APIRouter(prefix="/metrics", tags=["metrics"])
 
 
 @router.get("/aggregate/spans")
 async def aggregate_span_metrics(
+    request: Request,
     project_id: str = Query(...),
     metric: str = Query(..., description="Metric name, e.g. general_faithfulness"),
     from_date: Optional[datetime] = None,
@@ -31,6 +34,7 @@ async def aggregate_span_metrics(
         metric_name = MetricName(metric)
     except Exception:
         raise HTTPException(400, "Invalid project_id or metric name")
+    await authenticate(request, READ, project_id=project_id, allow_legacy=True)
 
     if not to_date:
         to_date = datetime.utcnow()
@@ -64,6 +68,7 @@ async def aggregate_span_metrics(
         }},
         {"$unwind": "$metrics"},
         {"$match": {"metrics.name": metric}},
+        *current_verdicts_stage(),
         {"$group": {
             "_id": date_trunc,
             "avg_value": {"$avg": {"$toDouble": "$metrics.value"}},
@@ -97,6 +102,7 @@ async def aggregate_span_metrics(
 
 @router.get("/aggregate/traces")
 async def aggregate_trace_metrics(
+    request: Request,
     project_id: str = Query(...),
     metric: str = Query(..., description="Metric name, e.g. task_completion"),
     from_date: Optional[datetime] = None,
@@ -111,6 +117,7 @@ async def aggregate_trace_metrics(
         metric_name = MetricName(metric)
     except Exception:
         raise HTTPException(400, "Invalid project_id or metric name")
+    await authenticate(request, READ, project_id=project_id, allow_legacy=True)
 
     if not to_date:
         to_date = datetime.utcnow()
@@ -133,6 +140,7 @@ async def aggregate_trace_metrics(
         }},
         {"$unwind": "$metrics"},
         {"$match": {"metrics.name": metric}},
+        *current_verdicts_stage(),
         {"$group": {
             "_id": date_trunc,
             "avg_value": {"$avg": {"$toDouble": "$metrics.value"}},
@@ -162,6 +170,7 @@ async def aggregate_trace_metrics(
 
 @router.get("/summary")
 async def project_metrics_summary(
+    request: Request,
     project_id: str = Query(...),
     days: int = Query(7, description="Look-back window in days"),
 ):
@@ -172,63 +181,10 @@ async def project_metrics_summary(
         pid = PydanticObjectId(project_id)
     except Exception:
         raise HTTPException(400, "Invalid project_id")
+    await authenticate(request, READ, project_id=project_id, allow_legacy=True)
 
-    since = datetime.utcnow() - timedelta(days=days)
-
-    span_pipeline = [
-        {"$match": {"project_id": pid, "timestamp": {"$gte": since}, "metrics.0": {"$exists": True}}},
-        {"$unwind": "$metrics"},
-        {"$group": {
-            "_id": "$metrics.name",
-            "avg_value": {"$avg": {"$toDouble": "$metrics.value"}},
-            "count": {"$sum": 1},
-        }},
-    ]
-
-    trace_pipeline = [
-        {"$match": {"project_id": pid, "started_at": {"$gte": since}, "metrics.0": {"$exists": True}}},
-        {"$unwind": "$metrics"},
-        {"$group": {
-            "_id": "$metrics.name",
-            "avg_value": {"$avg": {"$toDouble": "$metrics.value"}},
-            "count": {"$sum": 1},
-        }},
-    ]
-
-    span_results = await Span.aggregate(span_pipeline).to_list()
-    trace_results = await Trace.aggregate(trace_pipeline).to_list()
-
-    cost_pipeline = [
-        {"$match": {"project_id": pid, "started_at": {"$gte": since}}},
-        {"$group": {
-            "_id": None,
-            "total_cost": {"$sum": "$total_cost_usd"},
-            "total_traces": {"$sum": 1},
-            "total_tokens": {"$sum": {"$add": ["$total_tokens_in", "$total_tokens_out"]}},
-            "avg_duration_ms": {"$avg": "$duration_ms"},
-        }},
-    ]
-    cost_results = await Trace.aggregate(cost_pipeline).to_list()
-    cost_data = cost_results[0] if cost_results else {}
-
-    return {
-        "project_id": project_id,
-        "period_days": days,
-        "span_metrics": {
-            r["_id"]: {"avg": round(r["avg_value"], 4), "evaluated_count": r["count"]}
-            for r in span_results
-        },
-        "trace_metrics": {
-            r["_id"]: {"avg": round(r["avg_value"], 4), "evaluated_count": r["count"]}
-            for r in trace_results
-        },
-        "cost": {
-            "total_usd": round(cost_data.get("total_cost", 0), 4),
-            "total_traces": cost_data.get("total_traces", 0),
-            "total_tokens": cost_data.get("total_tokens", 0),
-            "avg_duration_ms": round(cost_data.get("avg_duration_ms", 0)),
-        },
-    }
+    summary = await metrics_summary(pid, days)
+    return {"project_id": project_id, **summary}
 
 
 def _format_period(id_doc: dict, granularity: str) -> str:

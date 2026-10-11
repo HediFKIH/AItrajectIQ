@@ -1,15 +1,22 @@
 from beanie import Document, PydanticObjectId
 from pydantic import Field
+from pymongo import ASCENDING, IndexModel
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
 from .metric import Metric
 
+SPAN_ID_INDEX = "trace_sdk_span_unique"
+
 
 class SpanType(str, Enum):
     llm = "llm"
     tool = "tool"
+    agent = "agent"
+    chain = "chain"          # workflow/framework step that wraps other spans
+    retriever = "retriever"
+    embedding = "embedding"
 
 
 class Span(Document):
@@ -18,10 +25,21 @@ class Span(Document):
     step_index: int = 0
     span_type: SpanType
 
-    # --- Hierarchy fields (set by SDK) ---
+    # --- Common fields ---
+    name: Optional[str] = None
+    status: Optional[str] = None            # SDK: completed | failed — OpenTelemetry: ok | error
+    error: Optional[str] = None
+    source: str = "sdk"                     # sdk | otel
+    metadata: Optional[dict] = None
+
+    # --- Hierarchy fields (SDK span ids, or OpenTelemetry span ids in hex) ---
     sdk_span_id: Optional[str] = None
     parent_span_id: Optional[str] = None
     caller_chain: Optional[List[str]] = None
+
+    # --- Agent fields ---
+    agent_name: Optional[str] = None
+    role: Optional[str] = None
 
     # --- LLM fields ---
     provider: Optional[str] = None
@@ -30,6 +48,8 @@ class Span(Document):
     response: Optional[str] = None
     tokens_in: Optional[int] = None
     tokens_out: Optional[int] = None
+    cache_read_tokens: Optional[int] = None     # part of tokens_in read from the prompt cache
+    cache_write_tokens: Optional[int] = None    # part of tokens_in written to the prompt cache
     cost_usd: Optional[float] = None
     temperature: Optional[float] = None
     max_tokens: Optional[int] = None
@@ -57,4 +77,12 @@ class Span(Document):
             "trace_id",
             "project_id",
             "span_type",
+            IndexModel(
+                [("trace_id", ASCENDING), ("sdk_span_id", ASCENDING)],
+                name=SPAN_ID_INDEX,
+                unique=True,
+                partialFilterExpression={"sdk_span_id": {"$type": "string"}},
+            ),
+            IndexModel([("project_id", ASCENDING), ("timestamp", ASCENDING)]),
+            IndexModel([("project_id", ASCENDING), ("span_type", ASCENDING), ("timestamp", ASCENDING)]),
         ]

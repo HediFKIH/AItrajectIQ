@@ -19,7 +19,8 @@ import os
 from comet import download_model, load_from_checkpoint
 from evaluation.runner import configure_eval_llm, EvalLLMConfig
 from evaluation.web_search import configure_search, SearchConfig
-import llminsight
+from extensions import background_services, install
+import aitrajectiq
 
 load_dotenv(dotenv_path="../.env")
 
@@ -38,7 +39,7 @@ async def lifespan(app: FastAPI):
     # EVAL_LLM_BASE_URL: (optional) for OpenAI-compatible APIs (Ollama, Groq, DeepSeek…)
     eval_provider = os.getenv("EVAL_LLM_PROVIDER", "openai")
     eval_api_key = os.getenv("EVAL_LLM_API_KEY", openai_api_key or "")
-    eval_model = os.getenv("EVAL_LLM_MODEL", "gpt-4o")
+    eval_model = os.getenv("EVAL_LLM_MODEL", "gpt-4o-mini")
 
     if eval_api_key:
         configure_eval_llm(EvalLLMConfig(
@@ -68,7 +69,8 @@ async def lifespan(app: FastAPI):
     app.state.embedding_model = SentenceTransformer("BAAI/bge-large-en-v1.5")
     app.state.openai_client = OpenAI(api_key=openai_api_key)
     app.state.translation_eval_model = load_from_checkpoint(model_path)
-    yield
+    async with background_services(mcp_server):
+        yield
 
 
 origins = [
@@ -97,6 +99,7 @@ app.include_router(router)
 app.include_router(proxy_router)
 app.include_router(resources_router)
 app.include_router(retriever_router)
+mcp_server = install(app)
 
 
 

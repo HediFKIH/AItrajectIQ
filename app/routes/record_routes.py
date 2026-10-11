@@ -1,16 +1,13 @@
 
 # app/api/records.py
 
-from fastapi import APIRouter, HTTPException, status, Header
+from fastapi import APIRouter, HTTPException, status, Request
 from pydantic import BaseModel
 from typing import List,Literal
 from models.record import Record  # Beanie Document
-from models.project import Project
 from typing import Optional
 from beanie import PydanticObjectId
-
-from bson import ObjectId
-from sys import exception
+from security.api_keys import INGEST, READ, authenticate
 
 
 router = APIRouter(
@@ -30,19 +27,13 @@ class RegisterRecordRequest(BaseModel):
 
 
 @router.post("/", response_model=Record)
-async def create_record(
-    record_data: RegisterRecordRequest,
-    api_key: str = Header(...),  # Extract from headers
-):
-    
-    project = await Project.get(record_data.project_id)
-    if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+async def create_record(record_data: RegisterRecordRequest, request: Request):
+    auth = await authenticate(
+        request, INGEST, project_id=str(record_data.project_id), allow_legacy=True
+    )
+    project = auth.project
     if project.type != "LLMExplain":
-        print(project.type)
-        raise ValueError("Incompatible project type")
-    if project.api_key.key != api_key:
-        raise HTTPException(status_code=401, detail="Invalid API key")
+        raise HTTPException(status_code=400, detail="Records require an LLMExplain project")
 
 
     record = Record(**record_data.model_dump())
@@ -57,38 +48,31 @@ class RequestAnalysisData(BaseModel):
     anonymized: bool
 
 
-
-@router.get("/{record_id}", response_model=Record)
-async def get_record(record_id: str):
-    record = await Record.get(record_id)
+async def _owned_record(request: Request, record_id: str, scope: str) -> Record:
+    try:
+        record = await Record.get(PydanticObjectId(record_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid record_id")
     if not record:
-        raise HTTPException(status_code=404, detail="record not found")
+        raise HTTPException(status_code=404, detail="Record not found")
+    await authenticate(request, scope, project_id=str(record.project_id), allow_legacy=True)
     return record
 
+
+@router.get("/{record_id}", response_model=Record)
+async def get_record(record_id: str, request: Request):
+    return await _owned_record(request, record_id, READ)
+
+
 @router.get("/", response_model=List[Record])
-async def list_records(project_id=None):
-    if not project_id in (None, ""):
-        # print("!!!!!!!!!!")
-        try:
-            project_id = ObjectId(project_id)
-            project_id = PydanticObjectId(project_id)
-            return await Record.find(Record.project_id == project_id).to_list()
-            
-        except exception:
-            raise HTTPException(status_code=422, detail="Invalid project_id")
-    # print("??????????")
-    return await Record.find_all().to_list()
-
-
-
-
+async def list_records(request: Request, project_id: Optional[str] = None):
+    """Records of the calling key's project (`project_id` must match it if given)."""
+    auth = await authenticate(request, READ, project_id=project_id or None, allow_legacy=True)
+    return await Record.find(Record.project_id == auth.project.id).to_list()
 
 
 @router.delete("/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_record(record_id: str):
-    record = await Record.get(record_id)
-    if not record:
-        raise HTTPException(status_code=404, detail="Record not found")
-    
+async def delete_record(record_id: str, request: Request):
+    record = await _owned_record(request, record_id, INGEST)
     await record.delete()
     return None  # 204 No Content usually returns no body

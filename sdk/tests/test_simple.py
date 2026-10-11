@@ -6,12 +6,12 @@ Prérequis : OPENAI_API_KEY dans l'environnement
 Lancer : python tests/test_simple.py
 """
 
-import llminsight
+import aitrajectiq
 from openai import OpenAI
 
 # 2 lignes pour tout configurer
-llminsight.init(project_id="flow-ai-mobile", api_key="test-key-123")
-llminsight.patch()
+aitrajectiq.init(project_id="flow-ai-mobile", api_key="test-key-123")
+aitrajectiq.patch()
 
 # Code applicatif normal — AUCUNE modification
 client = OpenAI()

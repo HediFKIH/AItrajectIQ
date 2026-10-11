@@ -19,19 +19,16 @@ import tempfile
 import os
 from nltk import sent_tokenize
 
-
-
 def get_model_name(client):
-    """Récupère le nom du modèle depuis le client Azure ou utilise une valeur par défaut"""
+    """Model name from the Azure client, or a default value"""
     if hasattr(client, '_deployment'):
         return client._deployment
     return os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o")
 
-
 def ask_openai_if_true(claim, client):
     """
-    Demande au modèle si une affirmation est vraie
-    Compatible avec AzureOpenAI
+    Asks the model whether a claim is true
+    Compatible with AzureOpenAI
     """
     model = get_model_name(client)
     
@@ -69,11 +66,10 @@ Claim: "{claim}"
     
     raise ValueError("the response of 'ask_openai_if_true' isn't being provided in the expected format")
 
-
 def check_claim_with_context(claim, context, client):
     """
-    Vérifie si un contexte supporte une affirmation
-    Compatible avec AzureOpenAI
+    Checks whether a context supports a claim
+    Compatible with AzureOpenAI
     """
     model = get_model_name(client)
     
@@ -109,11 +105,10 @@ Context: """ + context
     
     raise ValueError("the response isn't being provided in the expected format")
 
-
 def is_relevant(query, context, client):
     """
-    Vérifie si un contexte est pertinent pour une requête
-    Compatible avec AzureOpenAI
+    Checks whether a context is relevant to a query
+    Compatible with AzureOpenAI
     """
     model = get_model_name(client)
     
@@ -155,9 +150,8 @@ Respond ONLY in JSON format like this:
     
     raise ValueError("the response isn't being provided in the expected format")
 
-
 async def retrieve_context_from_api(claim: str, host="http://localhost:8000") -> str:
-    """Récupère le contexte depuis l'API de récupération"""
+    """Context from the retrieval API"""
     print('retrieval function entered')
     url = f"{host}/retrieve/"
     payload = [claim]
@@ -174,9 +168,6 @@ async def retrieve_context_from_api(claim: str, host="http://localhost:8000") ->
 
     contexts = contexts_nested[0]
     return "\n\n".join(contexts[:3])
-
-
-
 
 def detect_lang(code,client):
     
@@ -201,15 +192,9 @@ Respond only with the language name, nothing else — no explanations, no format
             return decision
 
     raise ValueError("OpenAI is not returning information in the expected format")
-
-
-
-
 class MetricSchema(BaseModel):
-    """Schéma pour forcer OpenAI à répondre dans un format spécifique"""
+    """Schema forcing OpenAI to answer in a specific format"""
     metrics: list[MetricName]
-
-
 class Metrics:
     def __init__(self, query, answer, metrics_list, embedding_model=None, retrieved_contexts=None, 
                  client=None, index=None, category_index=None, match=None, must_contain=None, regex=None, translation_eval_model=None, translation_lang=None):
@@ -228,14 +213,14 @@ class Metrics:
         self.translation_eval_model=translation_eval_model
         self.translation_lang=translation_lang
         
-        # Ajouter le nom du modèle au client s'il ne l'a pas
+        # Add the model name to the client if it doesn't have one
         if self.client and not hasattr(self.client, '_deployment'):
             self.client._deployment = get_model_name(self.client)
 
     def break_into_claims(self, text=None):
         """
-        Décompose le texte en affirmations vérifiables
-        Compatible avec AzureOpenAI
+        Breaks the text into verifiable claims
+        Compatible with AzureOpenAI
         """
         if not text:
             text = self.response
@@ -267,7 +252,7 @@ class Metrics:
             raise ValueError("client isn't provided")
 
     async def general_faithfulness(self):
-        """Calcule la fidélité générale de la réponse"""
+        """General faithfulness of the answer"""
         claims = self.break_into_claims()
         details = []
         score = 0
@@ -310,7 +295,7 @@ class Metrics:
         return {'value': score, 'reason': str(details)}
 
     def answer_relevance(self, n=3):
-        """Calcule la pertinence de la réponse"""
+        """Relevance of the answer"""
         if self.client and self.embedding_model:
             model = get_model_name(self.client)
             
@@ -347,12 +332,6 @@ class Metrics:
             raise ValueError("the questions aren't being generated in the expected format")
         else:
             raise ValueError("Answer relevance can't be computed because either client or embedding model isn't provided")
-
-
-
-
-
-
 
     def evaluate_moderation(self):
 
@@ -418,15 +397,11 @@ class Metrics:
 
         raise ValueError("the response isn't being provided in the expected format")
 
-
-
     def hallucination(self):
         return {'value': self.hallucinations}
 
-
-
     def context_precision(self, k=3):
-        """Calcule la précision du contexte"""
+        """Context precision"""
         if not self.retrieved_contexts:
             warnings.warn("Context precision can't be computed because contexts aren't provided")
             return {'value': None}
@@ -457,7 +432,7 @@ class Metrics:
         return {'value': float(context_precision)}
 
     async def context_recall(self):
-        """Calcule le rappel du contexte"""
+        """Context recall"""
         if not self.retrieved_contexts:
             warnings.warn("Context recall can't be computed because contexts aren't provided")
             return {'value': None}
@@ -524,7 +499,7 @@ Respond in JSON:
             raise ValueError("client isn't provided")
 
     def contextual_faithfulness(self):
-        """Calcule la fidélité contextuelle"""
+        """Contextual faithfulness"""
         if not self.retrieved_contexts:
             warnings.warn("Contextual faithfulness can't be computed because contexts aren't provided")
             return {'value': None}
@@ -551,10 +526,6 @@ Respond in JSON:
 
         return {'value': k / len(claims), 'reason': str(details)}
     
-
-
-
-
     def comet_score(self,reference= None):
         if not reference: 
 
@@ -579,12 +550,6 @@ Respond in JSON:
         score=self.translation_eval_model.predict(data,batch_size=1,gpus=0)
         return {'value': score}
 
-
-
-
-
-
-
     def summary_completeness(self):
         summary_claims=self.break_into_claims(self.response)
         original_claims=self.break_into_claims(self.query)
@@ -600,7 +565,6 @@ Respond in JSON:
             
         return {'value': (k/len(original_claims))}
 
-    
     def conciseness(self):
         sentences=sent_tokenize(self.response)
         n=len(sentences)
@@ -615,18 +579,10 @@ Respond in JSON:
 
         return {'value': ((m-discarded_length)/m)}
 
-
-
     def compression_ratio(self):
         value=len(self.query)/len(self.response)
         return {'value': value}
     
-
-
-
-
-
-
     def compilable(self, lang=None):
         if not lang:
             lang=detect_lang(self.response, self.client)
@@ -671,8 +627,6 @@ Respond in JSON:
                 reason= result.stderr.strip() or result.stdout.strip()
                 return {'value': False, 'reason': reason}
 
-
-
     def code_relevance(self, lang=None,n=5):
         if not lang:
             lang=detect_lang(self.response, self.client)
@@ -708,10 +662,6 @@ Respond in JSON:
             
         raise ValueError("the questions aren't being generated in the expected format")
 
-
-
-
-
     def equals(self):
         if self.match:
             return {'value': self.match==self.response}
@@ -719,16 +669,12 @@ Respond in JSON:
         raise ValueError("Response match must be provided")
 
     def contains(self):
-
-
         if self.must_contain:
             return {'value': self.must_contain in self.response}
             
         raise ValueError("Substring to search for must be provided.")
 
     def matches_regex(self):
-
-
         if self.regex: 
             match=re.findall(self.regex,self.response) 
             
@@ -736,8 +682,6 @@ Respond in JSON:
                 return {'value': True}
             return {'value': False}
         raise ValueError("Regular expression must be provided.")
-
-
 
     def is_json(self):
         '''
@@ -753,13 +697,11 @@ Respond in JSON:
         except (ValueError, TypeError):
             return {'value': False}
 
-
-
     def decide_on_metrics(self):
         """
-        Décide quelles métriques appliquer
-        ATTENTION: Nécessite l'API beta.chat.completions.parse
-        qui pourrait ne pas être disponible sur Azure OpenAI
+        Decides which metrics apply
+        WARNING: requires the beta.chat.completions.parse API,
+        which may not be available on Azure OpenAI
         """
         model = get_model_name(self.client)
         
@@ -799,7 +741,7 @@ metrics list: {self.metrics_list}
             raise ValueError("client isn't provided")
         
         try:
-            # Essayer avec l'API beta (peut ne pas fonctionner avec Azure)
+            # Try the beta API (may not work with Azure)
             completion = self.client.beta.chat.completions.parse(
                 model=model,
                 messages=[
@@ -811,8 +753,8 @@ metrics list: {self.metrics_list}
             )
             metric = completion.choices[0].message.parsed
         except AttributeError:
-            # Fallback si beta.chat n'est pas disponible
-            print("⚠️ beta.chat.completions.parse non disponible, utilisation de l'API standard")
+            # Fallback when beta.chat is not available
+            print("⚠️ beta.chat.completions.parse not available, using the standard API")
             response = self.client.chat.completions.create(
                 model=model,
                 messages=[
@@ -829,7 +771,7 @@ metrics list: {self.metrics_list}
         self.metrics_list = metric.metrics
 
     async def compute_and_save(self, log_id):
-        """Calcule toutes les métriques et les sauvegarde"""
+        """Computes all the metrics and saves them"""
         results = []
         for metric_name in self.metrics_list:
             method = getattr(self, metric_name, None)

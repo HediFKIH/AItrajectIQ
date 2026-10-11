@@ -5,7 +5,7 @@ from enum import Enum
 
 from models.metric import MetricType, MetricName, METRIC_TYPE_TO_NAMES
 from models.log import Log
-from models.apikey import APIKey
+from models.apikey import ApiKey
 from pydantic import model_validator
 from typing import Literal, Optional, List
 from datetime import datetime
@@ -47,7 +47,6 @@ class Project(Document):
     type: ProjectCategory
     task: Optional[ProjectTask] =None
     enabled_metrics:List[MetricName] = []
-    api_key: Optional[APIKey] = None
     created_at: datetime 
     @model_validator(mode='after')
     def check_task(self):
@@ -77,11 +76,7 @@ class Project(Document):
     @before_event(Delete)
     async def delete_logs(self):
         await Log.find(Log.project_id == self.id).delete()
-    
 
- 
-
-
-
-
-    
+    @before_event(Delete)
+    async def delete_api_keys(self):
+        await ApiKey.find(ApiKey.project_id == self.id).delete()

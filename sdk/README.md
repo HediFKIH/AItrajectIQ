@@ -1,4 +1,4 @@
-# LLMInsight SDK
+# AItrajectIQ SDK
 
 SDK Python d'observabilité pour applications LLM. Fonctionne avec **n'importe quelle application** — zéro code à ajouter.
 
@@ -11,12 +11,16 @@ pip install -e ./sdk
 ## Intégration — identique pour TOUS les projets
 
 ```python
-import llminsight
-llminsight.init(project_id="...", api_key="...", base_url="http://localhost:8000")
-llminsight.patch()
+import aitrajectiq
+aitrajectiq.init(api_key="atq_...", base_url="http://localhost:8000")
+aitrajectiq.patch()
 
 # C'est tout. Le reste du code est INCHANGÉ.
 ```
+
+La clé API (`atq_...`, créée via `POST /projects/{id}/api-keys`) identifie le projet : `project_id` est optionnel. Sans argument, `init()` lit `AITRAJECTIQ_API_KEY`, `AITRAJECTIQ_PROJECT_ID` et `AITRAJECTIQ_BASE_URL`.
+
+Pour les agents qui ne sont pas en Python (TypeScript, Java, .NET…) ou déjà instrumentés avec OpenTelemetry, pas besoin du SDK : le backend reçoit l'OTLP sur `/otel/v1/traces` (voir le README principal).
 
 Ça fonctionne immédiatement avec :
 - OpenAI (sync + async)
@@ -28,7 +32,7 @@ llminsight.patch()
 ## Ce qui se passe automatiquement
 
 ```
-Votre application                          LLMInsight
+Votre application                          AItrajectIQ
      │                                         │
      ├─ appelle openai.create(...)              │
      │   └── span capturé ──fire & forget──────→│── calcule le coût
@@ -44,7 +48,7 @@ Votre application                          LLMInsight
 
 ### Traces automatiques
 
-Si vous n'utilisez pas `with llminsight.trace(...)`, le SDK crée automatiquement une trace et y rattache tous les appels LLM. Les appels espacés de plus de 30 secondes créent une nouvelle trace.
+Si vous n'utilisez pas `with aitrajectiq.trace(...)`, le SDK crée automatiquement une trace et y rattache tous les appels LLM. Les appels espacés de plus de 30 secondes créent une nouvelle trace.
 
 ### Métriques
 
@@ -64,7 +68,7 @@ Les métriques sont calculées **côté backend**, pas dans le SDK. Le SDK ne fa
 ### Traces manuelles (agents complexes)
 
 ```python
-with llminsight.trace("mon-agent", {"user_id": "u-42"}):
+with aitrajectiq.trace("mon-agent", {"user_id": "u-42"}):
     resp1 = openai_client.chat.completions.create(...)   # span auto
     resp2 = anthropic_client.messages.create(...)         # span auto
 ```
@@ -72,14 +76,14 @@ with llminsight.trace("mon-agent", {"user_id": "u-42"}):
 ### Capture d'outils
 
 ```python
-with llminsight.tool_span("web_search", {"query": "..."}):
+with aitrajectiq.tool_span("web_search", {"query": "..."}):
     results = search_web(query)
 ```
 
 ### Décorateur
 
 ```python
-@llminsight.observe(name="planning")
+@aitrajectiq.observe(name="planning")
 def plan(messages):
     return openai_client.chat.completions.create(...)
 ```

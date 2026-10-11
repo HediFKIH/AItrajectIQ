@@ -53,6 +53,10 @@ class MetricName(str, Enum):
     cost_efficiency = "cost_efficiency"
     action_consistency = "action_consistency"
     total_cost_summary = "total_cost_summary"
+    claims_grounded = "claims_grounded"
+    instruction_adherence = "instruction_adherence"
+    change_verification = "change_verification"
+    error_recovery = "error_recovery"
 
 
 
@@ -102,6 +106,10 @@ METRIC_TYPE_TO_NAMES = {
         MetricName.cost_efficiency,
         MetricName.action_consistency,
         MetricName.total_cost_summary,
+        MetricName.claims_grounded,
+        MetricName.instruction_adherence,
+        MetricName.change_verification,
+        MetricName.error_recovery,
     ],
 }
 
@@ -110,3 +118,4 @@ class Metric(BaseModel):
     name: MetricName
     value: Any
     reason: Optional[str]=None
+    judge: Optional[str] = None     # "<model>@v<version>" of the LLM judge, for LLM-judged metrics

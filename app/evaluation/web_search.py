@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 import httpx
 
-log = logging.getLogger("llminsight.eval.search")
+log = logging.getLogger("aitrajectiq.eval.search")
 
 
 @dataclass

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="llminsight",
+    name="aitrajectiq",
     version="0.1.0",
     description="SDK d'observabilité pour applications LLM — capture transparente des appels LLM et outils",
     long_description=open("README.md", encoding="utf-8").read(),
@@ -11,7 +11,8 @@ setup(
     install_requires=[],
     entry_points={
         "console_scripts": [
-            "llminsight-run=llminsight.cli:main",
+            "aitrajectiq=aitrajectiq.__main__:main",
+            "aitrajectiq-run=aitrajectiq.cli:main",
         ],
     },
     extras_require={
